@@ -13,7 +13,7 @@
 ## Scope
 
 - ラベルの定義（語彙）と供給元を決める: (a) `tags` からのマッピング、(b) AI レスポンス付与、のどちらか/併用。
-- 提案カード（[concierge-card-reasoning-breakdown.md](concierge-card-reasoning-breakdown.md)）と比較ビュー（[three-product-comparison-view.md](three-product-comparison-view.md)）で共用。
+- 提案カード（[concierge-card-reasoning-breakdown.md](../active/concierge-card-reasoning-breakdown.md)）と比較ビュー（[three-product-comparison-view.md](three-product-comparison-view.md)）で共用。
 
 ## Non-scope
 

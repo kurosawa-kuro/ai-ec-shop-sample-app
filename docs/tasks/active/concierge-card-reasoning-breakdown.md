@@ -27,12 +27,12 @@ AIが選んだ理由：直接肌に使うアイテムの中でも日常使いし
 
 ## Non-scope
 
-- 多ターン化（[concierge-multi-turn-refinement.md](concierge-multi-turn-refinement.md)）。
-- 商品マスタへのスコア付与（[gift-fit-labels.md](gift-fit-labels.md) で扱う）。
+- 多ターン化（[concierge-multi-turn-refinement.md](../backlog/concierge-multi-turn-refinement.md)）。
+- 商品マスタへのスコア付与（[gift-fit-labels.md](../backlog/gift-fit-labels.md) で扱う）。
 
 ## Skeleton
 
-- レスポンス: `recommendations: [{ productId, reason, easyToGive, caution, fitFor }]` へ寄せ、理由と商品を**ペア**で扱う（[concierge-reason-product-alignment.md](concierge-reason-product-alignment.md) の index ズレ対策と同時に解消する）。
+- レスポンス: `recommendations: [{ productId, reason, easyToGive, caution, fitFor }]` へ寄せ、理由と商品を**ペア**で扱う（[concierge-recommendation-accuracy.md](../backlog/concierge-recommendation-accuracy.md) の理由ズレ対策と同時に解消する）。
 
 ## Plan
 
@@ -55,5 +55,4 @@ AIが選んだ理由：直接肌に使うアイテムの中でも日常使いし
 
 ## Notes
 
-- [concierge-reason-product-alignment.md](concierge-reason-product-alignment.md)（理由ズレ）と同時実装が効率的。
-- [concierge-ground-recommendations-in-catalog.md](concierge-ground-recommendations-in-catalog.md)（属性接地）が入っていると注意点の質が上がる。
+- [concierge-recommendation-accuracy.md](../backlog/concierge-recommendation-accuracy.md)（接地・理由ズレ・ID整合）と同時実装が効率的（応答スキーマを一緒に整える）。
