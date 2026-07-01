@@ -900,6 +900,13 @@ h2 {
   resize: vertical;
 }
 
+/* 結果が縦に長いので、相談フォームはデスクトップで追従させる（左カラムの空白を解消） */
+.chat-panel {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+}
+
 .thinking-overlay {
   display: flex;
   flex-direction: column;
@@ -1067,23 +1074,35 @@ h2 {
   margin-bottom: 4px;
 }
 
+/* 4つの理由を1つの淡いパネルにまとめ、「文章の壁」に見せない */
 .reason-breakdown {
   display: grid;
-  gap: 7px;
+  gap: 8px;
   margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface-soft);
 }
 
 .reason-item {
   margin: 0;
-  padding-left: 10px;
-  border-left: 2px solid var(--line);
   color: var(--muted);
-  line-height: 1.7;
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.reason-item + .reason-item {
+  padding-top: 8px;
+  border-top: 1px solid rgba(201, 169, 110, 0.28);
 }
 
 .reason-item span {
-  color: var(--ink);
-  font-weight: 800;
+  display: block;
+  margin-bottom: 1px;
+  color: var(--brand-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .comparison-toggle-row {
@@ -2274,8 +2293,22 @@ h2 {
   .filters,
   .cart-line,
   .order-card,
+  /* モバイルは 1 カラムなので追従は無効化（フォームが画面に貼り付くのを防ぐ） */
+  .chat-panel {
+    position: static;
+  }
+
+  /* 推薦カードはモバイルでも画像を小さく左寄せ（1fr にすると画像が全幅で巨大化する） */
   .recommendation-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  /* 汎用 .product-image の height:100%（商品カード用）が推薦画像に漏れて縦伸びするのを固定 */
+  .recommendation-card .product-image {
+    height: 72px;
+    aspect-ratio: 1;
+    min-height: 0;
   }
 
   /* モバイルは 1 カラム。カードは横並び（画像左＋情報右）で縦の巨大化を防ぐ */

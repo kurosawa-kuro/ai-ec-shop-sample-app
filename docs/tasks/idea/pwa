@@ -1,0 +1,138 @@
+## 結論
+
+できます。
+React + Vite の Lumière Select は **PWA化しやすい構成** です。
+
+ただし、優先度は **P0ではなくP1** です。
+AIコンシェルジュ体験が固まった後に、**「スマホに入れて試せる営業デモ」** としてPWA化すると価値が出ます。
+
+---
+
+## 理由
+
+PWAに必要な主な要素は、
+
+```text
+Web App Manifest
+Service Worker
+HTTPS配信
+```
+
+です。React自体がPWA機能を持つというより、Vite側で `vite-plugin-pwa` を入れて、manifest と Service Worker を生成・登録する形が現実的です。`vite-plugin-pwa` は React もサポートしており、Manifest の自動注入や Workbox によるオフライン対応を扱えます。([GitHub][1])
+
+また、Service Worker は HTTPS または localhost などの secure context が必要です。Cloudflare Pages 配信ならこの条件は満たしやすいです。([MDNウェブドキュメント][2])
+
+---
+
+## Lumière Select での有力シナリオ
+
+PWA化で一番強い見せ方はこれです。
+
+```text
+営業先のスマホで開く
+↓
+「ホーム画面に追加」
+↓
+アプリ風に起動
+↓
+AI美容ギフト相談
+↓
+カート・注文履歴・店舗インサイトまで体験
+```
+
+つまり、**アプリ開発なしで“アプリっぽいAI接客EC”に見える** のが強みです。
+
+特に今回のコンセプトなら、PWA化で刺さる機能はこのへんです。
+
+```text
+1. ホーム画面追加
+2. アプリ風の起動画面
+3. 商品画像・静的ページのキャッシュ
+4. カート・注文履歴の継続
+5. オフライン時の「AI相談はオンラインで利用できます」表示
+```
+
+AI相談自体は DeepSeek / Supabase Edge Function が必要なので、完全オフライン対応は不要です。
+
+---
+
+## 破綻条件
+
+PWA化でやりすぎると危険です。
+
+```text
+NG:
+- AI相談までオフライン対応しようとする
+- Push通知を早期に入れる
+- バックグラウンド同期を入れる
+- 本格ネイティブアプリっぽく作り込む
+```
+
+今回の営業デモでは、PWAの目的は **「インストール可能な見た目」** で十分です。
+
+---
+
+## 実務・行動への影響
+
+実装は軽いです。
+
+```bash
+cd app
+npm i vite-plugin-pwa -D
+```
+
+`vite.config.js` / `vite.config.ts` に追加。
+
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'Lumière Select',
+        short_name: 'Lumière',
+        description: 'AIで美容ギフト選びの困りごとを解決するECデモ',
+        theme_color: '#e8c4b8',
+        background_color: '#fff8f5',
+        display: 'standalone',
+        start_url: '/',
+        icons: [
+          {
+            src: '/icons/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: '/icons/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+        ],
+      },
+      workbox: {
+        navigateFallback: '/index.html',
+      },
+    }),
+  ],
+})
+```
+
+入れるなら、優先度はこうです。
+
+```text
+P0: AIコンシェルジュの完成
+P1: PWA化
+P1: 3商品比較ビュー
+P2: Push通知
+```
+
+判断としては、**PWA化はあり** です。
+ただし目的は「便利機能」ではなく、**営業デモの見栄えとスマホ体験の強化** です。
+
+[1]: https://github.com/vite-pwa/vite-plugin-pwa?utm_source=chatgpt.com "vite-pwa/vite-plugin-pwa: Zero-config PWA for Vite"
+[2]: https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API?utm_source=chatgpt.com "Service Worker API - MDN Web Docs"

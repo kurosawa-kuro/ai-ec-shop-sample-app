@@ -467,7 +467,7 @@ function GiftComparison({ recommendations }) {
 function ReasonItem({ label, text }) {
   return (
     <p className="reason-item">
-      <span>{label}：</span>
+      <span>{label}</span>
       {text}
     </p>
   )

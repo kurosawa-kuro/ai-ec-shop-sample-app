@@ -16,10 +16,10 @@ supabase:
 ai:
   maxQueryLength: 200      # Edge Function に渡す相談文の最大文字数
   maxCandidates: 15        # リランキングに渡す候補商品の最大数
-  dailyLimit: 50           # 1日あたりのAI機能利用上限（ブラウザ単位・コンシェルジュ＋リランキング合算）
+  dailyLimit: 30           # 1日あたりのAI機能利用上限（ブラウザ単位・コンシェルジュ＋リランキング合算）
 
 # --- Cloudflare Pages ---
 deploy:
   distDir: app/dist
   pagesUrl: https://lumiere-select.pages.dev
-  latestDeployment: https://e661d7d8.lumiere-select.pages.dev
+  latestDeployment: https://0ee9c95b.lumiere-select.pages.dev
