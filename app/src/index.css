@@ -1002,6 +1002,25 @@ h2 {
   margin-bottom: 4px;
 }
 
+.reason-breakdown {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.reason-item {
+  margin: 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--line);
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.reason-item span {
+  color: var(--ink);
+  font-weight: 800;
+}
+
 .recommendation-actions {
   display: flex;
   flex-wrap: wrap;

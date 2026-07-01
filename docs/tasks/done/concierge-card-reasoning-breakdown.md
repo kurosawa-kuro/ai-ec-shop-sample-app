@@ -27,12 +27,12 @@ AIが選んだ理由：直接肌に使うアイテムの中でも日常使いし
 
 ## Non-scope
 
-- 多ターン化（[concierge-multi-turn-refinement.md](../backlog/concierge-multi-turn-refinement.md)）。
+- 多ターン化（[concierge-multi-turn-refinement.md](../active/concierge-multi-turn-refinement.md)）。
 - 商品マスタへのスコア付与（[gift-fit-labels.md](../backlog/gift-fit-labels.md) で扱う）。
 
 ## Skeleton
 
-- レスポンス: `recommendations: [{ productId, reason, easyToGive, caution, fitFor }]` へ寄せ、理由と商品を**ペア**で扱う（[concierge-recommendation-accuracy.md](../backlog/concierge-recommendation-accuracy.md) の理由ズレ対策と同時に解消する）。
+- レスポンス: `recommendations: [{ productId, reason, easyToGive, caution, fitFor }]` へ寄せ、理由と商品を**ペア**で扱う（[concierge-recommendation-accuracy.md](../active/concierge-recommendation-accuracy.md) の理由ズレ対策と同時に解消する）。
 
 ## Plan
 
@@ -53,6 +53,17 @@ AIが選んだ理由：直接肌に使うアイテムの中でも日常使いし
 - `cd app && npm run build && npm run lint && npx playwright test`（推薦3件の既存 E2E を壊さない）。
 - `make fn-deploy` 後、手動で3観点が出ることを確認。
 
+## Done Evidence
+
+- `app/src/pages/Concierge.jsx`: 推薦カードを `recommendations: [{ productId, reason, easyToGive, caution, fitFor }]` に寄せ、旧 `recommendedProductIds + reasons[]` も正規化で互換対応。
+- `supabase/functions/concierge/index.ts`: Edge Function の prompt / fallback を 3〜4 観点のペア構造に更新。注意点は「確認すると安心」系の断定しない表現に調整。
+- `app/e2e/demo-flow.spec.js`: フォールバック時に「AIが選んだ理由」「渡しやすいポイント」「注意したい点」が表示される確認を追加。
+- `cd app && npm run build`: passed（Vite の既存 chunk size warning のみ）。
+- `cd app && npm run lint`: passed。
+- `npx playwright test`: 既存の別 repo dev server が `5173` を占有して初回 webServer timeout。検証用にこの repo を `5175` で起動し、一時 config で `15 passed` を確認。
+- `make fn-deploy`: passed。`recommend-products` / `concierge` を Supabase project `ftimimljrflfboopsqgm` に deploy。
+- deploy 後の実応答確認: `concierge` が `recommendations` 3件を返し、各件に `productId`, `reason`, `easyToGive`, `caution`, `fitFor` が含まれることを確認。
+
 ## Notes
 
-- [concierge-recommendation-accuracy.md](../backlog/concierge-recommendation-accuracy.md)（接地・理由ズレ・ID整合）と同時実装が効率的（応答スキーマを一緒に整える）。
+- [concierge-recommendation-accuracy.md](../active/concierge-recommendation-accuracy.md)（接地・理由ズレ・ID整合）と同時実装が効率的（応答スキーマを一緒に整える）。

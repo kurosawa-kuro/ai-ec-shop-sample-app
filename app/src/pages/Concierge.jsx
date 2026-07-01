@@ -16,14 +16,35 @@ const chips = [
   '自分へのご褒美',
 ]
 
+const fallbackRecommendations = [
+  {
+    productId: 'gift-001',
+    reason: '複数アイテム入りで見栄えがよく、好みが分からない相手にも贈りやすいです。',
+    easyToGive: '箱を開けた時のギフト感があり、誕生日やお礼の場面でもきちんと選んだ印象を作れます。',
+    caution: '香りや使用感に敏感な方には、セット内容を事前に確認すると安心です。',
+    fitFor: '相手の好みがまだ詳しく分からない時や、見栄えを重視したい相手に合います。',
+  },
+  {
+    productId: 'skincare-001',
+    reason: '軽い使い心地で初めてのスキンケアギフトにも選びやすいです。',
+    easyToGive: '日常使いしやすい保湿ケアなので、特別すぎず気遣いとして渡しやすいです。',
+    caution: '肌に合うかは個人差があるため、敏感肌の方には成分や使い方を確認すると安心です。',
+    fitFor: '美容初心者や、シンプルなケアを好む相手に合います。',
+  },
+  {
+    productId: 'relax-001',
+    reason: '美容品ほど好みを選ばず、休息を気遣うギフトとして渡しやすいです。',
+    easyToGive: '相手を労わる気持ちが伝わりやすく、関係性が浅くても重くなりにくいです。',
+    caution: '香りに敏感な方には、無香料・控えめタイプを確認すると安心です。',
+    fitFor: '仕事や日常で疲れがたまりやすい相手、リラックス時間を大切にする相手に合います。',
+  },
+]
+
 const fallbackResponse = {
   summary: 'AIが混み合っています。定番ギフト候補を表示します。',
-  recommendedProductIds: ['gift-001', 'skincare-001', 'relax-001'],
-  reasons: [
-    '複数アイテム入りで見栄えがよく、好みが分からない相手にも贈りやすいです。',
-    '軽い使い心地で初めてのスキンケアギフトにも選びやすいです。',
-    '美容品ほど好みを選ばず、休息を気遣うギフトとして渡しやすいです。',
-  ],
+  recommendedProductIds: fallbackRecommendations.map((item) => item.productId),
+  recommendations: fallbackRecommendations,
+  reasons: fallbackRecommendations.map((item) => item.reason),
   followUpQuestion: '香りあり・香り控えめのどちらが好みに近そうですか？',
 }
 
@@ -53,10 +74,10 @@ export default function Concierge() {
 
   const activeResponse = response ?? fallbackResponse
   const recommendations = useMemo(() => {
-    return activeResponse.recommendedProductIds
-      .map((id, index) => ({
-        product: products.find((item) => item.id === id),
-        reason: activeResponse.reasons?.[index],
+    return activeResponse.recommendations
+      .map((recommendation) => ({
+        ...recommendation,
+        product: products.find((item) => item.id === recommendation.productId),
       }))
       .filter((item) => item.product)
   }, [activeResponse])
@@ -221,7 +242,7 @@ export default function Concierge() {
                     {activeResponse.summary}
                   </motion.p>
                   <div className="recommendation-list">
-                    {recommendations.map(({ product, reason }, i) => (
+                    {recommendations.map(({ product, reason, easyToGive, caution, fitFor }, i) => (
                       <motion.article
                         key={product.id}
                         className="recommendation-card"
@@ -244,7 +265,12 @@ export default function Concierge() {
                         <div>
                           <p className="product-category">{product.category}</p>
                           <h2>{product.name}</h2>
-                          <p>{reason ?? product.aiReason}</p>
+                          <div className="reason-breakdown">
+                            <ReasonItem label="AIが選んだ理由" text={reason ?? product.aiReason} />
+                            <ReasonItem label="渡しやすいポイント" text={easyToGive} />
+                            <ReasonItem label="注意したい点" text={caution} />
+                            {fitFor && <ReasonItem label="合いそうな相手" text={fitFor} />}
+                          </div>
                           <div className="recommendation-actions">
                             <TransitionLink to={`/products/${product.id}`}>詳細を見る</TransitionLink>
                             <button type="button" onClick={(e) => handleAdd(product, e)}>
@@ -296,18 +322,62 @@ export default function Concierge() {
   )
 }
 
+function ReasonItem({ label, text }) {
+  return (
+    <p className="reason-item">
+      <span>{label}：</span>
+      {text}
+    </p>
+  )
+}
+
 function normalizeConciergeResponse(data) {
-  const ids = Array.isArray(data?.recommendedProductIds)
-    ? data.recommendedProductIds.filter((id) => products.some((product) => product.id === id))
-    : []
-  const recommendedProductIds = [...ids, ...fallbackResponse.recommendedProductIds]
-    .filter((id, index, array) => array.indexOf(id) === index)
+  const aiRecommendations = Array.isArray(data?.recommendations)
+    ? data.recommendations
+    : Array.isArray(data?.recommendedProductIds)
+      ? data.recommendedProductIds.map((productId, index) => ({
+        productId,
+        reason: data?.reasons?.[index],
+      }))
+      : []
+
+  const validRecommendations = aiRecommendations
+    .map((item, index) => normalizeRecommendation(item, index))
+    .filter(Boolean)
+
+  const recommendations = [...validRecommendations, ...fallbackResponse.recommendations]
+    .filter((item, index, array) => array.findIndex((candidate) => candidate.productId === item.productId) === index)
     .slice(0, 3)
 
   return {
     summary: data?.summary || fallbackResponse.summary,
-    recommendedProductIds,
-    reasons: Array.isArray(data?.reasons) ? data.reasons : fallbackResponse.reasons,
+    recommendedProductIds: recommendations.map((item) => item.productId),
+    recommendations,
+    reasons: recommendations.map((item) => item.reason),
     followUpQuestion: data?.followUpQuestion ?? fallbackResponse.followUpQuestion,
   }
+}
+
+function normalizeRecommendation(item, index) {
+  const product = products.find((candidate) => candidate.id === item?.productId)
+  if (!product) return null
+
+  const fallback = fallbackResponse.recommendations[index] ?? {
+    reason: product.aiReason,
+    easyToGive: '日常で使いやすく、相手に気を遣わせにくいギフトとして渡しやすいです。',
+    caution: '香り・使用感・成分の好みには個人差があるため、気になる場合は事前に確認すると安心です。',
+    fitFor: '相手の好みや生活スタイルに自然になじむギフトを探している時に合います。',
+  }
+
+  return {
+    productId: product.id,
+    reason: normalizeText(item?.reason, product.aiReason),
+    easyToGive: normalizeText(item?.easyToGive, fallback.easyToGive),
+    caution: normalizeText(item?.caution, fallback.caution),
+    fitFor: normalizeText(item?.fitFor, fallback.fitFor),
+  }
+}
+
+function normalizeText(value, fallback) {
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback
 }
