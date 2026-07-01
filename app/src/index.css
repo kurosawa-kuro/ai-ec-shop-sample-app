@@ -2119,6 +2119,10 @@ h2 {
   padding-bottom: 2px;
 }
 
+.closing-insight {
+  gap: 6px;
+}
+
 .closing-secondary:hover {
   color: var(--accent-soft);
   border-color: var(--accent);

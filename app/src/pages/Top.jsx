@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, Gift, Search, Sparkles } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, BarChart3, Gift, Search, Sparkles } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -308,6 +308,10 @@ export default function Top() {
             <Link className="closing-secondary" to="/products">
               商品を見る
               <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+            <Link className="closing-secondary closing-insight" to="/admin-demo">
+              <BarChart3 size={16} aria-hidden="true" />
+              店舗インサイトを見る
             </Link>
           </div>
         </div>
