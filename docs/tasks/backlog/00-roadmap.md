@@ -10,17 +10,19 @@
 
 ## 👉 いま次にやる（active）
 
-**[concierge-card-reasoning-breakdown](../active/concierge-card-reasoning-breakdown.md)** — 提案カードを「おすすめ理由 / 渡しやすい点 / 注意点」に3段化。owner 指名の最優先。
-→ [concierge-recommendation-accuracy](concierge-recommendation-accuracy.md) と応答スキーマを一緒に整えると効率的。
+**[refactoring-candidates](../active/refactoring-candidates.md)** — P0 実装後のクリーンアップ候補を確認し、次の安全な整理単位を選ぶ。
 
-## P0（このデモの価値を成立させる中核）
+P0 のコンシェルジュ中核4本は完了済み。次に価値を伸ばすなら P1 の
+[gift-fit-labels](gift-fit-labels.md) か [three-product-comparison-view](three-product-comparison-view.md) から着手する。
+
+## Done: P0（このデモの価値を成立させる中核）
 
 | 順 | タスク | 何のため |
 |---|---|---|
-| 1 | [concierge-card-reasoning-breakdown](../active/concierge-card-reasoning-breakdown.md)（＝active） | 「AIが勝手に選んだ」→「納得して選ぶ」。理由を分解表示 |
-| 2 | [concierge-recommendation-accuracy](concierge-recommendation-accuracy.md) | 提案の"適切さ・正確さ"。属性接地＋理由ズレ修正＋ID整合を1本に統合 |
-| 3 | [guided-problem-entry](guided-problem-entry.md) | 困りごとテンプレート入口。書けなくても相談に入れる |
-| 4 | [concierge-multi-turn-refinement](concierge-multi-turn-refinement.md) | 追加質問にワンタップで答えて再提案。「解決するまで付き合う」 |
+| 1 | [concierge-card-reasoning-breakdown](../done/concierge-card-reasoning-breakdown.md) | 「AIが勝手に選んだ」→「納得して選ぶ」。理由を分解表示 |
+| 2 | [concierge-recommendation-accuracy](../done/concierge-recommendation-accuracy.md) | 提案の"適切さ・正確さ"。属性接地＋理由ズレ修正＋ID整合を1本に統合 |
+| 3 | [guided-problem-entry](../done/guided-problem-entry.md) | 困りごとテンプレート入口。書けなくても相談に入れる |
+| 4 | [concierge-multi-turn-refinement](../done/concierge-multi-turn-refinement.md) | 追加質問にワンタップで答えて再提案。「解決するまで付き合う」 |
 
 ## P1（体験を強くする）
 
@@ -51,4 +53,5 @@
 
 - 本ロードマップは進行管理の入口であり仕様の正本ではない。確定仕様は `docs/01_requirements.md` / `docs/02_architecture.md` へ昇格する。
 - 着手時に該当タスクを `active/` へ移す。
-- 2026-07-01 整理: 旧 `concept-gap-analysis.md` を本ファイルへ集約。concierge 系3本を `concierge-recommendation-accuracy.md` に統合。孤児アセット（mobile-reliability-rebuild）を削除。P0 #1 を `active/` へ昇格。
+- 2026-07-01 整理: 旧 `concept-gap-analysis.md` を本ファイルへ集約。concierge 系3本を `concierge-recommendation-accuracy.md` に統合。孤児アセット（mobile-reliability-rebuild）を削除。P0 実行順を整理。
+- 2026-07-01 更新: P0 の concierge 中核4本（理由3段表示、接地/理由整合、困りごと入口、多ターン再提案）を実装・検証済みとして `done/` に移動。次フェーズは P1 の比較/ラベル/詳細引き継ぎで「納得して買う」体験を厚くする。

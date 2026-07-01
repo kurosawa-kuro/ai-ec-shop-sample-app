@@ -3,6 +3,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 const DEEPSEEK_API_KEY = Deno.env.get("DEEPSEEK_API_KEY") ?? ""
 const DEEPSEEK_MODEL = Deno.env.get("DEEPSEEK_MODEL") ?? "deepseek-chat"
 const MAX_QUERY_LENGTH = 200
+const MAX_CANDIDATES = 40
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -50,17 +51,21 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { query, productIds } = await req.json()
+    const { query, productIds, candidates } = await req.json()
 
     if (!query) {
       return json({ error: "query は必須です" }, 400)
     }
 
     const trimmedQuery = String(query).slice(0, MAX_QUERY_LENGTH)
+    const catalog = normalizeCandidates(candidates, productIds)
 
     const systemPrompt = [
       "あなたは美容・ギフト ECショップの親切なAIコンシェルジュです。",
       "ユーザーの悩みや要望を聞いて、商品を3件提案してください。",
+      "必ずユーザーから渡された候補カタログの中の商品IDだけを選んでください。",
+      "商品名・カテゴリ・価格・tags・giftFor・description を根拠にし、IDの文字列だけから推測しないでください。",
+      "例: 「肌が弱い」「敏感」には tags の「敏感肌向け」「低刺激感」「香り控えめ」を優先してください。",
       "各商品は必ず productId と理由の4観点を1セットにして返してください。productId と理由を別配列で分けないでください。",
       "reason はおすすめ理由、easyToGive は渡しやすいポイント、caution は注意したい点、fitFor は合いそうな相手条件です。",
       "提案後に、より良い提案のための追加質問を1つ返してください。",
@@ -69,15 +74,14 @@ Deno.serve(async (req) => {
       "",
       "利用可能な商品IDの一例（実際の商品IDを使うこと）:",
       "skincare-001〜006, haircare-001〜006, bodycare-001〜006,",
-      "relax-001〜006, gift-001〜006, mens-gift-001〜006",
+      "relax-001〜006, gift-001〜006, mensgift-001〜006",
       "",
       "注意: 効能・効果を断言しない。「使いやすい」「選びやすい」「ギフト感がある」「確認すると安心」などの表現を使う。",
       "caution は不安を煽らず、香り・色味・成分・相手の好みなど確認ポイントとして書いてください。",
     ].join("\n")
 
-    const availableIds = productIds ?? []
-    const userPrompt = availableIds.length > 0
-      ? `相談: ${trimmedQuery}\n利用可能な商品ID: ${availableIds.join(", ")}`
+    const userPrompt = catalog.length > 0
+      ? `相談: ${trimmedQuery}\n候補カタログJSON: ${JSON.stringify(catalog)}`
       : `相談: ${trimmedQuery}`
 
     const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
@@ -103,11 +107,175 @@ Deno.serve(async (req) => {
 
     const data = await res.json()
     const content = data.choices?.[0]?.message?.content ?? ""
-    return json(JSON.parse(content))
+    return json(normalizeModelResponse(JSON.parse(content), catalog, trimmedQuery))
   } catch {
     return json(FALLBACK_RESPONSE)
   }
 })
+
+type Candidate = {
+  id: string
+  name?: string
+  category?: string
+  price?: number
+  tags?: string[]
+  giftFor?: string[]
+  description?: string
+}
+
+type Recommendation = {
+  productId: string
+  reason?: string
+  easyToGive?: string
+  caution?: string
+  fitFor?: string
+}
+
+function normalizeCandidates(candidates: unknown, productIds: unknown): Candidate[] {
+  if (Array.isArray(candidates)) {
+    return candidates
+      .map((candidate) => {
+        if (!candidate || typeof candidate !== "object") return null
+        const item = candidate as Record<string, unknown>
+        const id = normalizeText(item.id)
+        if (!id) return null
+        return {
+          id,
+          name: normalizeText(item.name),
+          category: normalizeText(item.category),
+          price: typeof item.price === "number" ? item.price : undefined,
+          tags: normalizeStringArray(item.tags).slice(0, 6),
+          giftFor: normalizeStringArray(item.giftFor).slice(0, 5),
+          description: normalizeText(item.description),
+        }
+      })
+      .filter((candidate): candidate is Candidate => Boolean(candidate))
+      .filter((candidate, index, array) => array.findIndex((item) => item.id === candidate.id) === index)
+      .slice(0, MAX_CANDIDATES)
+  }
+
+  if (Array.isArray(productIds)) {
+    return productIds
+      .map((id) => normalizeText(id))
+      .filter((id): id is string => Boolean(id))
+      .filter((id, index, array) => array.indexOf(id) === index)
+      .slice(0, MAX_CANDIDATES)
+      .map((id) => ({ id }))
+  }
+
+  return []
+}
+
+function normalizeModelResponse(body: Record<string, unknown>, catalog: Candidate[], query: string) {
+  const candidateIds = new Set(catalog.map((candidate) => candidate.id))
+  const fallbackById = new Map(FALLBACK_RESPONSE.recommendations.map((item) => [item.productId, item]))
+  const candidateById = new Map(catalog.map((candidate) => [candidate.id, candidate]))
+  const rawRecommendations = Array.isArray(body?.recommendations)
+    ? body.recommendations
+    : Array.isArray(body?.recommendedProductIds)
+      ? body.recommendedProductIds.map((productId, index) => ({
+        productId,
+        reason: Array.isArray(body?.reasons) ? body.reasons[index] : undefined,
+      }))
+      : []
+
+  const validRecommendations = rawRecommendations
+    .map((recommendation) => normalizeRecommendation(recommendation))
+    .filter((recommendation): recommendation is Recommendation => {
+      if (!recommendation) return false
+      return candidateIds.size === 0 || candidateIds.has(recommendation.productId)
+    })
+    .filter((recommendation, index, array) => (
+      array.findIndex((item) => item.productId === recommendation.productId) === index
+    ))
+
+  const fallbackRecommendations = catalog
+    .filter((candidate) => !validRecommendations.some((item) => item.productId === candidate.id))
+    .map((candidate) => ({
+      productId: candidate.id,
+      reason: fallbackById.get(candidate.id)?.reason ?? `${candidate.name ?? "候補商品"}は、相談内容に合わせて日常で使いやすいギフトとして選びやすいです。`,
+      easyToGive: fallbackById.get(candidate.id)?.easyToGive ?? "価格や用途が分かりやすく、相手に気を遣わせにくい候補です。",
+      caution: fallbackById.get(candidate.id)?.caution ?? "香り・使用感・成分の好みには個人差があるため、気になる場合は事前に確認すると安心です。",
+      fitFor: fallbackById.get(candidate.id)?.fitFor ?? "相手の好みや生活スタイルに自然になじむギフトを探している時に合います。",
+    }))
+
+  const recommendations = rankRecommendations([...validRecommendations, ...fallbackRecommendations], candidateById, query)
+    .slice(0, 3)
+    .map((recommendation) => {
+      const fallback = fallbackRecommendations.find((item) => item.productId === recommendation.productId)
+        ?? fallbackById.get(recommendation.productId)
+      return {
+        productId: recommendation.productId,
+        reason: recommendation.reason ?? fallback?.reason ?? "相談内容に合わせて選びやすい候補です。",
+        easyToGive: recommendation.easyToGive ?? fallback?.easyToGive ?? "用途が分かりやすく、相手に気を遣わせにくい候補です。",
+        caution: recommendation.caution ?? fallback?.caution ?? "香り・使用感・成分の好みには個人差があるため、気になる場合は事前に確認すると安心です。",
+        fitFor: recommendation.fitFor ?? fallback?.fitFor ?? "相手の好みや生活スタイルに自然になじむギフトを探している時に合います。",
+      }
+    })
+
+  return {
+    summary: normalizeText(body?.summary) ?? FALLBACK_RESPONSE.summary,
+    recommendations,
+    recommendedProductIds: recommendations.map((recommendation) => recommendation.productId),
+    reasons: recommendations.map((recommendation) => recommendation.reason ?? ""),
+    followUpQuestion: normalizeText(body?.followUpQuestion),
+  }
+}
+
+function rankRecommendations(
+  recommendations: Recommendation[],
+  candidateById: Map<string, Candidate>,
+  query: string,
+): Recommendation[] {
+  const isSensitiveQuery = /肌が弱|敏感|低刺激|肌荒れ|香り控えめ|香りが苦手/.test(query)
+  if (!isSensitiveQuery) return recommendations
+
+  return recommendations
+    .map((recommendation, index) => ({
+      recommendation,
+      index,
+      score: scoreSensitiveFit(candidateById.get(recommendation.productId)),
+    }))
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .map((item) => item.recommendation)
+}
+
+function scoreSensitiveFit(candidate: Candidate | undefined): number {
+  if (!candidate) return 0
+  const tags = candidate.tags ?? []
+  let score = 0
+  if (tags.includes("敏感肌向け")) score += 10
+  if (tags.includes("低刺激感")) score += 9
+  if (tags.includes("香り控えめ")) score += 6
+  if (candidate.category === "スキンケア") score += 2
+  if (candidate.category === "ヘアケア") score += 1
+  return score
+}
+
+function normalizeRecommendation(value: unknown): Recommendation | null {
+  if (!value || typeof value !== "object") return null
+  const item = value as Record<string, unknown>
+  const productId = normalizeText(item.productId)
+  if (!productId) return null
+
+  return {
+    productId,
+    reason: normalizeText(item.reason),
+    easyToGive: normalizeText(item.easyToGive),
+    caution: normalizeText(item.caution),
+    fitFor: normalizeText(item.fitFor),
+  }
+}
+
+function normalizeStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.map((item) => normalizeText(item)).filter((item): item is string => Boolean(item))
+    : []
+}
+
+function normalizeText(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined
+}
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {

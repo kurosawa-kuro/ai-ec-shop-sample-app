@@ -386,6 +386,33 @@ h2 {
   max-width: 760px;
 }
 
+.guided-entry {
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.guided-group {
+  display: grid;
+  gap: 7px;
+}
+
+.guided-group > span {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.guided-submit {
+  justify-self: start;
+  gap: 7px;
+  margin-top: 2px;
+}
+
 .concierge-form label,
 .filters label {
   color: var(--ink);
@@ -486,6 +513,16 @@ h2 {
 .chip:hover {
   border-color: var(--brand);
   color: var(--brand-strong);
+}
+
+.chip-active {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+.chip-active:hover {
+  color: #fff;
 }
 
 .cta-row {
@@ -669,6 +706,23 @@ h2 {
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+}
+
+.gift-label-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 10px;
+}
+
+.gift-label-list span {
+  padding: 5px 9px;
+  border: 1px solid rgba(122, 68, 83, 0.22);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brand-strong);
+  font-size: 0.74rem;
+  font-weight: 800;
 }
 
 .ai-reason {
@@ -953,6 +1007,7 @@ h2 {
 
 .result-summary,
 .follow-up,
+.turn-status,
 .success-message,
 .ai-status {
   margin-bottom: 14px;
@@ -961,6 +1016,16 @@ h2 {
   background: var(--surface-soft);
   color: var(--ink);
   font-weight: 700;
+}
+
+.turn-status {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 7px 10px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
 }
 
 .success-message {
@@ -1019,6 +1084,156 @@ h2 {
 .reason-item span {
   color: var(--ink);
   font-weight: 800;
+}
+
+.comparison-toggle-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.comparison-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+}
+
+.comparison-head h2 {
+  margin-bottom: 4px;
+}
+
+.comparison-head p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.comparison-table {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.comparison-row {
+  display: grid;
+  grid-template-columns: 120px repeat(3, minmax(120px, 1fr));
+  min-width: 560px;
+  border-bottom: 1px solid var(--line);
+}
+
+.comparison-row:last-child {
+  border-bottom: 0;
+}
+
+.comparison-row > * {
+  padding: 10px;
+  border-right: 1px solid var(--line);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.comparison-row > *:last-child {
+  border-right: 0;
+}
+
+.comparison-row > span {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.comparison-row--head {
+  background: var(--accent-soft);
+}
+
+.comparison-row--head strong {
+  color: var(--ink);
+  font-size: 0.8rem;
+}
+
+.comparison-row b {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.comparison-best {
+  color: var(--brand-strong);
+  background: #fff8f0;
+}
+
+.follow-up-panel {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+}
+
+.follow-up-panel .follow-up {
+  margin-bottom: 12px;
+  padding: 0;
+  background: transparent;
+}
+
+.follow-up-answer {
+  display: grid;
+  gap: 12px;
+}
+
+.follow-up-form {
+  display: grid;
+  gap: 7px;
+}
+
+.follow-up-form label {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.follow-up-form > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.follow-up-form input {
+  margin: 0;
+}
+
+.follow-up-form button {
+  margin: 0;
+  padding: 0 14px;
+  border-radius: var(--radius);
+  font-weight: 800;
+}
+
+.follow-up-limit {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.ai-context-panel {
+  border-color: rgba(122, 68, 83, 0.28);
+  background: #fff8f0;
+}
+
+.context-query {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.detail-reason-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
 }
 
 .recommendation-actions {
@@ -1940,8 +2155,13 @@ h2 {
     width: 100%;
   }
 
+  .follow-up-form > div {
+    grid-template-columns: 1fr;
+  }
+
   .cta-row,
   .cta-row .button,
+  .guided-submit,
   .products-toolbar,
   .ai-sort {
     width: 100%;

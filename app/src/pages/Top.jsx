@@ -6,10 +6,37 @@ import products from '../data/products'
 import { cardReveal, staggerFast, staggerGrid } from '../lib/motion'
 
 const promptChips = [
-  '予算5,000円で彼女に贈る',
-  '美容に詳しくない友人へ',
-  '香り控えめで失敗しにくいもの',
+  '肌が弱い友人に贈りたい',
+  '美容に詳しくない相手に失敗しにくいもの',
+  '予算5,000円で高見えするギフト',
+  '香りが強すぎないものを選びたい',
+  '彼女への記念日ギフト',
+  '職場の女性に重すぎないプレゼント',
 ]
+
+const guideGroups = [
+  {
+    id: 'recipient',
+    label: '相手',
+    options: ['友人', '彼女', '母', '職場の女性', '自分'],
+  },
+  {
+    id: 'concern',
+    label: '悩み',
+    options: ['肌が弱い', '美容に詳しくない', '香りが苦手', '何が喜ばれるか分からない', '高見えさせたい'],
+  },
+  {
+    id: 'budget',
+    label: '予算',
+    options: ['3,000円以内', '5,000円くらい', '7,000円くらい'],
+  },
+]
+
+const initialGuide = {
+  recipient: '友人',
+  concern: '肌が弱い',
+  budget: '5,000円くらい',
+}
 
 const findProducts = (ids) => ids.map((id) => products.find((p) => p.id === id)).filter(Boolean)
 
@@ -51,15 +78,36 @@ const hideBrokenImage = (event) => {
 
 export default function Top() {
   const [message, setMessage] = useState('')
+  const [guide, setGuide] = useState(initialGuide)
   const navigate = useNavigate()
+
+  const guidedMessage = buildGuidedMessage(guide)
+
+  const navigateToConcierge = (query, auto = false) => {
+    const params = new URLSearchParams()
+    if (query.trim()) {
+      params.set('message', query.trim())
+    }
+    if (auto && query.trim()) {
+      params.set('auto', '1')
+    }
+    navigate(`/concierge${params.toString() ? `?${params.toString()}` : ''}`)
+  }
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    const params = new URLSearchParams()
-    if (message.trim()) {
-      params.set('message', message.trim())
-    }
-    navigate(`/concierge${params.toString() ? `?${params.toString()}` : ''}`)
+    navigateToConcierge(message)
+  }
+
+  const handleGuideChange = (groupId, value) => {
+    const nextGuide = { ...guide, [groupId]: value }
+    setGuide(nextGuide)
+    setMessage(buildGuidedMessage(nextGuide))
+  }
+
+  const handleGuidedSubmit = () => {
+    const query = message.trim() || guidedMessage
+    navigateToConcierge(query, true)
   }
 
   return (
@@ -83,6 +131,30 @@ export default function Top() {
           <p className="lead">
             「肌が弱い女友達に贈るギフト」——そんな一言で大丈夫。36品のギフトから、渡しやすい候補を AI が3つに絞ります。
           </p>
+          <div className="guided-entry" aria-label="困りごとから選ぶ相談">
+            {guideGroups.map((group) => (
+              <div className="guided-group" key={group.id}>
+                <span>{group.label}</span>
+                <div className="chip-row">
+                  {group.options.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      className={`chip ${guide[group.id] === option ? 'chip-active' : ''}`}
+                      aria-pressed={guide[group.id] === option}
+                      onClick={() => handleGuideChange(group.id, option)}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <button type="button" className="button primary guided-submit" onClick={handleGuidedSubmit}>
+              <Sparkles size={17} aria-hidden="true" />
+              この条件で相談する
+            </button>
+          </div>
           <form className="concierge-form" onSubmit={handleSubmit}>
             <label htmlFor="gift-message">どんな相手に、どんなギフト？</label>
             <div className="hero-search">
@@ -100,7 +172,7 @@ export default function Top() {
             </div>
             <div className="chip-row" aria-label="相談例">
               {promptChips.map((chip) => (
-                <button key={chip} type="button" className="chip" onClick={() => setMessage(chip)}>
+                <button key={chip} type="button" className="chip" onClick={() => navigateToConcierge(chip, true)}>
                   {chip}
                 </button>
               ))}
@@ -242,4 +314,8 @@ export default function Top() {
       </section>
     </main>
   )
+}
+
+function buildGuidedMessage(guide) {
+  return `${guide.recipient}に贈るギフトを探しています。${guide.concern}相手にも渡しやすく、予算は${guide.budget}です。`
 }

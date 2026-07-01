@@ -1,10 +1,11 @@
 import { Send, ShoppingCart, Sparkles } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import TransitionLink from '../components/TransitionLink'
 import products from '../data/products'
 import { addToCart, recordConsultation, saveAiContext } from '../lib/cart'
+import { getComparisonRows, getGiftLabels } from '../lib/giftLabels'
 import { fadeUp } from '../lib/motion'
 import { askConcierge } from '../lib/supabase'
 
@@ -15,6 +16,8 @@ const chips = [
   '美容初心者向け',
   '自分へのご褒美',
 ]
+
+const MAX_CONCIERGE_TURNS = 2
 
 const fallbackRecommendations = [
   {
@@ -61,16 +64,20 @@ const dealCard = {
 
 export default function Concierge() {
   const imageRefs = useRef(new Map())
+  const autoSubmitRef = useRef(false)
   const location = useLocation()
-  const initialMessage = useMemo(
-    () => new URLSearchParams(location.search).get('message') ?? '',
-    [location.search],
-  )
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search])
+  const initialMessage = useMemo(() => searchParams.get('message') ?? '', [searchParams])
+  const shouldAutoSubmit = searchParams.get('auto') === '1'
   const [message, setMessage] = useState(initialMessage)
   const [response, setResponse] = useState(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [cartMessage, setCartMessage] = useState('')
+  const [conversationQuery, setConversationQuery] = useState('')
+  const [turnCount, setTurnCount] = useState(0)
+  const [followUpAnswer, setFollowUpAnswer] = useState('')
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false)
 
   const activeResponse = response ?? fallbackResponse
   const recommendations = useMemo(() => {
@@ -82,31 +89,60 @@ export default function Concierge() {
       .filter((item) => item.product)
   }, [activeResponse])
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    const query = message.trim()
+  useEffect(() => {
+    if (!shouldAutoSubmit || autoSubmitRef.current || !initialMessage.trim()) return
+    autoSubmitRef.current = true
+    submitQuery(initialMessage)
+  }, [initialMessage, shouldAutoSubmit])
+
+  const submitQuery = async (rawQuery, options = {}) => {
+    const query = rawQuery.trim()
     if (!query) return
 
     setHasSubmitted(true)
     setIsLoading(true)
     setCartMessage('')
+    setFollowUpAnswer('')
     try {
       const data = await askConcierge(
         query,
-        products.map((product) => product.id),
+        products.map(toConciergeCandidate),
       )
       const normalized = normalizeConciergeResponse(data)
       setResponse(normalized)
-      saveAiContext(normalized.recommendedProductIds, query)
+      setConversationQuery(query)
+      setTurnCount(options.turn ?? 1)
+      setIsComparisonOpen(false)
+      saveAiContext(normalized.recommendedProductIds, query, normalized.recommendations)
       recordConsultation(query, normalized.recommendedProductIds)
     } catch (error) {
       const summary = error?.name === 'AiLimitExceededError' ? error.message : fallbackResponse.summary
       setResponse({ ...fallbackResponse, summary })
-      saveAiContext(fallbackResponse.recommendedProductIds, query)
+      setConversationQuery(query)
+      setTurnCount(options.turn ?? 1)
+      setIsComparisonOpen(false)
+      saveAiContext(fallbackResponse.recommendedProductIds, query, fallbackResponse.recommendations)
       recordConsultation(query, fallbackResponse.recommendedProductIds)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    submitQuery(message, { turn: 1 })
+  }
+
+  const handleFollowUpSubmit = (answer) => {
+    const trimmedAnswer = answer.trim()
+    if (!trimmedAnswer || !activeResponse.followUpQuestion || turnCount >= MAX_CONCIERGE_TURNS) return
+    const baseQuery = conversationQuery || message
+    const nextQuery = [
+      baseQuery,
+      `追加質問: ${activeResponse.followUpQuestion}`,
+      `回答: ${trimmedAnswer}`,
+    ].join('\n')
+    submitQuery(nextQuery, { turn: turnCount + 1 })
   }
 
   const handleAdd = (product, event) => {
@@ -241,6 +277,9 @@ export default function Concierge() {
                   <motion.p className="result-summary" variants={fadeUp} initial="hidden" animate="show">
                     {activeResponse.summary}
                   </motion.p>
+                  <motion.p className="turn-status" variants={fadeUp} initial="hidden" animate="show">
+                    相談ターン {Math.max(turnCount, 1)} / {MAX_CONCIERGE_TURNS}
+                  </motion.p>
                   <div className="recommendation-list">
                     {recommendations.map(({ product, reason, easyToGive, caution, fitFor }, i) => (
                       <motion.article
@@ -265,6 +304,7 @@ export default function Concierge() {
                         <div>
                           <p className="product-category">{product.category}</p>
                           <h2>{product.name}</h2>
+                          <GiftLabelList labels={getGiftLabels(product)} />
                           <div className="reason-breakdown">
                             <ReasonItem label="AIが選んだ理由" text={reason ?? product.aiReason} />
                             <ReasonItem label="渡しやすいポイント" text={easyToGive} />
@@ -282,15 +322,73 @@ export default function Concierge() {
                       </motion.article>
                     ))}
                   </div>
+                  {recommendations.length === 3 && (
+                    <motion.div
+                      className="comparison-toggle-row"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: recommendations.length * 0.16 + 0.12, duration: 0.3 }}
+                    >
+                      <button
+                        type="button"
+                        className="button secondary"
+                        onClick={() => setIsComparisonOpen((current) => !current)}
+                      >
+                        {isComparisonOpen ? '比較を閉じる' : '3品を比較する'}
+                      </button>
+                    </motion.div>
+                  )}
+                  {isComparisonOpen && (
+                    <GiftComparison recommendations={recommendations} />
+                  )}
                   {activeResponse.followUpQuestion && (
-                    <motion.p
-                      className="follow-up"
+                    <motion.div
+                      className="follow-up-panel"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: recommendations.length * 0.16 + 0.2, duration: 0.35 }}
                     >
-                      {activeResponse.followUpQuestion}
-                    </motion.p>
+                      <p className="follow-up">{activeResponse.followUpQuestion}</p>
+                      {turnCount < MAX_CONCIERGE_TURNS ? (
+                        <div className="follow-up-answer">
+                          <div className="chip-row" aria-label="追加質問の回答候補">
+                            {getFollowUpOptions(activeResponse.followUpQuestion).map((option) => (
+                              <button
+                                key={option}
+                                type="button"
+                                className="chip"
+                                onClick={() => handleFollowUpSubmit(option)}
+                              >
+                                {option}
+                              </button>
+                            ))}
+                          </div>
+                          <form
+                            className="follow-up-form"
+                            onSubmit={(event) => {
+                              event.preventDefault()
+                              handleFollowUpSubmit(followUpAnswer)
+                            }}
+                          >
+                            <label htmlFor="follow-up-answer">追加で伝えること</label>
+                            <div>
+                              <input
+                                id="follow-up-answer"
+                                type="text"
+                                value={followUpAnswer}
+                                onChange={(event) => setFollowUpAnswer(event.target.value)}
+                                placeholder="例: 香りは控えめがよさそう"
+                              />
+                              <button type="submit" disabled={!followUpAnswer.trim() || isLoading}>
+                                再提案
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      ) : (
+                        <p className="follow-up-limit">追加条件を反映した提案です。</p>
+                      )}
+                    </motion.div>
                   )}
                   <AnimatePresence>
                     {cartMessage && (
@@ -322,6 +420,50 @@ export default function Concierge() {
   )
 }
 
+function GiftLabelList({ labels }) {
+  if (!labels.length) return null
+  return (
+    <div className="gift-label-list" aria-label="ギフト適合ラベル">
+      {labels.map((label) => (
+        <span key={label}>{label}</span>
+      ))}
+    </div>
+  )
+}
+
+function GiftComparison({ recommendations }) {
+  const rows = getComparisonRows(recommendations)
+  return (
+    <section className="comparison-panel" aria-label="3品のギフト比較">
+      <div className="comparison-head">
+        <h2>3品をギフト選定軸で比較</h2>
+        <p>価格やスペックではなく、渡しやすさの違いで見比べられます。</p>
+      </div>
+      <div className="comparison-table">
+        <div className="comparison-row comparison-row--head">
+          <span>選定軸</span>
+          {recommendations.map(({ product }) => (
+            <strong key={product.id}>{product.name}</strong>
+          ))}
+        </div>
+        {rows.map((row) => (
+          <div className="comparison-row" key={row.key}>
+            <span>{row.label}</span>
+            {row.values.map((value, index) => (
+              <b
+                key={`${row.key}-${recommendations[index].product.id}`}
+                className={value === row.highlight ? 'comparison-best' : ''}
+              >
+                {value}
+              </b>
+            ))}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function ReasonItem({ label, text }) {
   return (
     <p className="reason-item">
@@ -329,6 +471,26 @@ function ReasonItem({ label, text }) {
       {text}
     </p>
   )
+}
+
+function toConciergeCandidate(product) {
+  return {
+    id: product.id,
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    tags: product.tags,
+    giftFor: product.giftFor,
+    description: product.description,
+  }
+}
+
+function getFollowUpOptions(question) {
+  if (/香り|匂い/.test(question)) return ['好きそう', '苦手そう', '分からない']
+  if (/関係|相手|どなた|誰/.test(question)) return ['友人', '彼女', '職場', '家族']
+  if (/予算|価格|金額/.test(question)) return ['3,000円以内', '5,000円くらい', '7,000円くらい']
+  if (/肌|敏感/.test(question)) return ['敏感肌かも', 'そこまで気にしない', '分からない']
+  return ['使いやすさ重視', '特別感重視', '分からない']
 }
 
 function normalizeConciergeResponse(data) {

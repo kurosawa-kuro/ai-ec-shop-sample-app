@@ -37,7 +37,7 @@
 
 ## Non-scope
 
-- カード UI の3段理由化（[concierge-card-reasoning-breakdown.md](../active/concierge-card-reasoning-breakdown.md) / active）。
+- カード UI の3段理由化（[concierge-card-reasoning-breakdown.md](../done/concierge-card-reasoning-breakdown.md) / done）。
 - 多ターン絞り込み（[concierge-multi-turn-refinement.md](concierge-multi-turn-refinement.md)）。
 
 ## Skeleton
@@ -62,7 +62,21 @@
 - `cd app && npm run build && npm run lint && npx playwright test`（推薦3件の既存 E2E を壊さない）。
 - `make fn-deploy` 後、敏感肌系が上位＋理由ズレなしを手動確認。
 
+## Done Evidence
+
+- `app/src/pages/Concierge.jsx` / `app/src/lib/supabase.js`: `askConcierge` に `id/name/category/price/tags/giftFor/description` を含む `candidates` を送るよう変更。互換用に `productIds` も併送。
+- `supabase/functions/concierge/index.ts`: 候補カタログ JSON を prompt に渡し、ID 文字列だけでなく `tags/giftFor/category/description` に接地して選ぶ指示へ更新。ID 例も実 prefix の `mensgift-001〜006` に修正。
+- `supabase/functions/concierge/index.ts`: 候補外 ID をサーバー側でも除外し、旧レスポンス形も `recommendations` に正規化。欠けた観点は補完。
+- `supabase/functions/concierge/index.ts`: 「肌が弱い」「敏感」等の相談では `敏感肌向け` / `低刺激感` / `香り控えめ` タグ候補を上位に寄せる軽い決定的リランキングを追加。
+- `app/e2e/demo-flow.spec.js`: `candidates` に属性が入ること、無効 ID の理由が表示に混ざらないことを追加検証。
+- `cd app && npm run build`: passed（Vite の既存 chunk size warning のみ）。
+- `cd app && npm run lint`: passed。
+- `deno check supabase/functions/concierge/index.ts`: skipped（この環境に `deno` がなく `command not found`）。代替として `make fn-deploy` の Supabase bundling は passed。
+- `npx playwright test`: 既存の別 repo dev server が `5173` を占有しているため、この repo を `5175` で起動し一時 config で実行。`16 passed`。
+- `make fn-deploy`: passed。`concierge` を Supabase project `ftimimljrflfboopsqgm` に deploy。
+- deploy 後の実応答確認: `肌が弱い女友達に予算5000円くらいで渡しやすいギフト` に対し、候補内 ID のみで `skincare-001`, `skincare-002`, `haircare-001` が返り、先頭が敏感肌系候補になった。
+
 ## Notes
 
-- [concierge-card-reasoning-breakdown.md](../active/concierge-card-reasoning-breakdown.md)（P0・次アクション）と同時実装が効率的（応答スキーマを一緒に整える）。
+- [concierge-card-reasoning-breakdown.md](../done/concierge-card-reasoning-breakdown.md)（P0・次アクション）と同時実装が効率的（応答スキーマを一緒に整える）。
 - 旧タスク concierge-ground-recommendations-in-catalog / concierge-reason-product-alignment / concierge-prompt-id-mismatch を本タスクへ統合（2026-07-01）。

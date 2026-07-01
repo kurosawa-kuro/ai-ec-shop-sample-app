@@ -29,7 +29,8 @@ export function addToCart(product, quantity = 1, source = 'browse') {
   saveCart(cart)
   recordCartEvent(product.id, quantity, source)
   if (source === 'concierge') {
-    saveAiContext([product.id])
+    const currentContext = getAiContext()
+    saveAiContext([product.id], currentContext?.query ?? '', currentContext?.recommendations ?? [])
   }
   return cart
 }
@@ -62,12 +63,13 @@ export function saveOrder(order) {
   return orders
 }
 
-export function saveAiContext(productIds, query = '') {
+export function saveAiContext(productIds, query = '', recommendations = []) {
   localStorage.setItem(
     AI_CONTEXT_KEY,
     JSON.stringify({
       productIds,
       query,
+      recommendations,
       savedAt: new Date().toISOString(),
     }),
   )

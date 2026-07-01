@@ -19,11 +19,15 @@ export async function recommendProducts(query, candidates) {
 }
 
 // AI コンシェルジュ
-export async function askConcierge(query, productIds = []) {
+export async function askConcierge(query, candidates = []) {
   if (!supabase) throw new Error('Supabase client is not configured')
   consumeAiLimit()
   const { data, error } = await supabase.functions.invoke('concierge', {
-    body: { query, productIds },
+    body: {
+      query,
+      candidates,
+      productIds: candidates.map((candidate) => candidate.id),
+    },
   })
   if (error) throw error
   return data

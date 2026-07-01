@@ -22,4 +22,4 @@ ai:
 deploy:
   distDir: app/dist
   pagesUrl: https://lumiere-select.pages.dev
-  latestDeployment: https://8b7fd164.lumiere-select.pages.dev
+  latestDeployment: https://e661d7d8.lumiere-select.pages.dev

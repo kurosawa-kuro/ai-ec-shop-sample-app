@@ -57,6 +57,17 @@
 - `cd app && npm run build && npm run lint && npx playwright test`
 - 手動: 選択のみで提案まで到達できることを確認。
 
+## Done Evidence
+
+- `app/src/pages/Top.jsx`: トップの自然文入力前に「相手 / 悩み / 予算」のカテゴリ別チップ入口を追加。選択内容から自然文相談を生成し、`auto=1` 付きでコンシェルジュへ遷移。
+- `app/src/pages/Top.jsx`: FB の相談例チップを6件に拡張し、押すだけでコンシェルジュへ送信する導線に変更。
+- `app/src/pages/Concierge.jsx`: `?auto=1` で来た初回相談文を自動送信し、自由入力なしでも提案表示まで進むよう変更。
+- `app/src/index.css`: ガイド入口の控えめなパネル表示、選択済みチップ、モバイル時の相談ボタン幅を追加。
+- `app/e2e/products-ui.spec.js`: トップの困りごと選択だけでコンシェルジュ提案まで進めるテストを追加。
+- `cd app && npm run build`: passed（Vite の既存 chunk size warning のみ）。
+- `cd app && npm run lint`: passed。
+- `npx playwright test`: 既存の別 repo dev server が `5173` を占有しているため、この repo を `5175` で起動し一時 config で実行。`17 passed`。
+
 ## Notes
 
 - UI は「奇をてらわない・普通で綺麗」を維持（`AGENTS.md` の UI 注意）。モバイルで詰まらないこと。
