@@ -1,4 +1,4 @@
-import { Send, ShoppingCart, Sparkles } from 'lucide-react'
+import { Send, ShieldCheck, ShoppingCart, Sparkles } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -279,6 +279,10 @@ export default function Concierge() {
                   </motion.p>
                   <motion.p className="turn-status" variants={fadeUp} initial="hidden" animate="show">
                     相談ターン {Math.max(turnCount, 1)} / {MAX_CONCIERGE_TURNS}
+                  </motion.p>
+                  <motion.p className="ai-trust-note" variants={fadeUp} initial="hidden" animate="show">
+                    <ShieldCheck size={15} aria-hidden="true" />
+                    カタログの商品情報に基づく提案です。効能は断定せず、AI 混雑時は定番候補にフォールバックします。
                   </motion.p>
                   <div className="recommendation-list">
                     {recommendations.map(({ product, reason, easyToGive, caution, fitFor }, i) => (

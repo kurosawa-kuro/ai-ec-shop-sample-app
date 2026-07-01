@@ -52,7 +52,12 @@ export default function Footer() {
           </Link>
           . All rights reserved.
         </p>
-        <p className="footer-note">本サイトは営業デモ用です。実在の企業・商品とは関係ありません。</p>
+        <p className="footer-note">
+          <Link className="footer-about-link" to="/about">
+            このサイトについて（AI 実装デモ）
+          </Link>
+          ／実在の企業・商品とは関係ありません。
+        </p>
       </div>
     </footer>
   )

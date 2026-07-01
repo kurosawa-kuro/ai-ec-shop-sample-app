@@ -2589,3 +2589,124 @@ h2 {
   color: var(--accent);
   flex-shrink: 0;
 }
+
+/* ── コンシェルジュ: AI の手堅さを示す一言 ───────── */
+
+.ai-trust-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border: 1px solid rgba(201, 169, 110, 0.42);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--brand-strong);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  font-weight: 600;
+}
+
+.ai-trust-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+/* ── /about: エンジニア営業レイヤー ───────────────── */
+
+.about-proofs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.about-proof {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 24px 22px;
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.about-proof-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  color: var(--brand-strong);
+}
+
+.about-proof h2 {
+  margin-bottom: 0;
+  font-size: 1.02rem;
+  line-height: 1.4;
+}
+
+.about-proof p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.about-stack {
+  margin-top: 44px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+
+.about-stack .section-title {
+  margin-bottom: 18px;
+}
+
+.about-stack .tag-list {
+  margin-bottom: 18px;
+}
+
+.about-role {
+  max-width: 760px;
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.85;
+}
+
+.about-back a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--brand-strong);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.about-back a:hover {
+  color: var(--brand);
+  transform: none;
+}
+
+.footer-about-link {
+  color: var(--brand-strong);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.footer-about-link:hover {
+  color: var(--brand);
+  text-decoration: underline;
+  transform: none;
+}
+
+@media (max-width: 920px) {
+  .about-proofs {
+    grid-template-columns: 1fr;
+  }
+}

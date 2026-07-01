@@ -12,6 +12,7 @@ import Checkout from './pages/Checkout'
 import Complete from './pages/Complete'
 import Orders from './pages/Orders'
 import AdminDemo from './pages/AdminDemo'
+import About from './pages/About'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/complete" element={<Complete />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/admin-demo" element={<AdminDemo />} />
+          <Route path="/about" element={<About />} />
         </Routes>
         <Footer />
         <FlyingCartItem />
