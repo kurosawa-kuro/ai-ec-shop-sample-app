@@ -32,3 +32,14 @@ export async function askConcierge(query, candidates = []) {
   if (error) throw error
   return data
 }
+
+// ギフト添え書き生成
+export async function generateGiftMessage({ query = '', productNames = [] } = {}) {
+  if (!supabase) throw new Error('Supabase client is not configured')
+  consumeAiLimit()
+  const { data, error } = await supabase.functions.invoke('concierge', {
+    body: { mode: 'gift-message', query, productNames },
+  })
+  if (error) throw error
+  return data
+}

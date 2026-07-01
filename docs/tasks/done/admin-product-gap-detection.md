@@ -50,6 +50,16 @@
 - `cd app && npm run build && npm run lint && npx playwright test`
 - 手動: サンプル/実データ両方で商品穴が妥当に出る。
 
+## Done Evidence
+
+- `app/src/pages/AdminDemo.jsx`: 相談トピックごとの需要と、カタログ `tags/category/giftFor/description` 由来の供給数を突き合わせる `detectProductGaps` を追加。
+- `app/src/pages/AdminDemo.jsx`: 既存の「AI 改善提案」内に「商品穴の検出」パネルを追加。相談件数 / 該当商品数 / 改善提案文を1〜3件表示。
+- `app/src/index.css`: 商品穴パネル用スタイルを追加。サンプル表示中バッジとは別に、改善提案内の補助情報として見せる。
+- `app/e2e/demo-flow.spec.js`: `/admin-demo` で商品穴パネルと「相談 n件 / 該当商品 n件」が表示されることを確認。
+- `cd app && npm run build`: passed（Vite の既存 chunk size warning のみ）。
+- `cd app && npm run lint`: passed。
+- `npx playwright test`: 既存の別 repo dev server が `5173` を占有しているため、この repo を `5175` で起動し一時 config で実行。`21 passed`。
+
 ## Notes
 
 - 「サンプル表示中」バッジと整合させ、実績と誤認させない（破綻条件）。

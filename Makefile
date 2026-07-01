@@ -50,7 +50,7 @@ lint:
 # Edge Functions デプロイ (supabase login 済みであること)
 fn-deploy:
 	supabase functions deploy recommend-products
-	supabase functions deploy concierge
+	supabase functions deploy concierge --use-api
 
 # Edge Functions ログ確認
 fn-logs:

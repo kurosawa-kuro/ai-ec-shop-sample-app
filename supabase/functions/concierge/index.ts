@@ -4,6 +4,7 @@ const DEEPSEEK_API_KEY = Deno.env.get("DEEPSEEK_API_KEY") ?? ""
 const DEEPSEEK_MODEL = Deno.env.get("DEEPSEEK_MODEL") ?? "deepseek-chat"
 const MAX_QUERY_LENGTH = 200
 const MAX_CANDIDATES = 40
+const FALLBACK_GIFT_MESSAGE = "最近忙しそうだったので、少しでもほっとできる時間になればと思って選びました。"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -51,7 +52,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { query, productIds, candidates } = await req.json()
+    const { mode, query, productIds, candidates, productNames } = await req.json()
+
+    if (mode === "gift-message") {
+      return json(await generateGiftMessage(query, productNames))
+    }
 
     if (!query) {
       return json({ error: "query は必須です" }, 400)
@@ -112,6 +117,59 @@ Deno.serve(async (req) => {
     return json(FALLBACK_RESPONSE)
   }
 })
+
+async function generateGiftMessage(query: unknown, productNames: unknown) {
+  try {
+    const trimmedQuery = typeof query === "string" ? query.slice(0, 220) : ""
+    const names = Array.isArray(productNames)
+      ? productNames.filter((name) => typeof name === "string").slice(0, 3)
+      : []
+
+    const systemPrompt = [
+      "あなたは美容・ギフト EC の添え書き作成アシスタントです。",
+      "購入者がギフトに添えられる自然な一言を日本語で1文だけ作ってください。",
+      "40〜70字程度。親しみはあるが重すぎない文体。",
+      "効能効果や肌改善を断言しない。相手を気遣う表現にする。",
+      "回答はJSONのみ:",
+      '{"message":"添え書きの一言"}',
+    ].join("\n")
+
+    const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${DEEPSEEK_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: DEEPSEEK_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          {
+            role: "user",
+            content: `相談文: ${trimmedQuery || "ギフト用"}\n商品: ${names.join("、") || "美容ギフト"}`,
+          },
+        ],
+        max_tokens: 160,
+        temperature: 0.7,
+      }),
+    })
+
+    if (!res.ok) return { message: FALLBACK_GIFT_MESSAGE }
+
+    const data = await res.json()
+    const content = data.choices?.[0]?.message?.content ?? ""
+    const parsed = JSON.parse(content)
+    return { message: normalizeGiftMessage(parsed?.message) ?? FALLBACK_GIFT_MESSAGE }
+  } catch {
+    return { message: FALLBACK_GIFT_MESSAGE }
+  }
+}
+
+function normalizeGiftMessage(value: unknown): string | null {
+  if (typeof value !== "string") return null
+  const trimmed = value.trim().replace(/^「|」$/g, "")
+  return trimmed ? trimmed.slice(0, 90) : null
+}
 
 type Candidate = {
   id: string

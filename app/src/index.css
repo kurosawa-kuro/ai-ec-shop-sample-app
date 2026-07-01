@@ -1378,6 +1378,62 @@ h2 {
   word-break: break-all;
 }
 
+.gift-message-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  text-align: left;
+}
+
+.gift-message-panel h2 {
+  margin-bottom: 4px;
+}
+
+.gift-message-panel p {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.gift-message-panel > button {
+  justify-self: start;
+}
+
+.gift-message-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.gift-message-result p {
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.65;
+}
+
+.gift-message-result button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.gift-message-status {
+  color: var(--brand-strong);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
 .order-card {
   grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.4fr) 120px;
 }
@@ -1571,6 +1627,45 @@ h2 {
 .suggestion-link:hover {
   color: var(--brand-strong);
   transform: none;
+}
+
+.gap-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.gap-panel h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.96rem;
+}
+
+.gap-list {
+  display: grid;
+  gap: 10px;
+}
+
+.gap-item {
+  display: grid;
+  gap: 9px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff8f0;
+}
+
+.gap-item strong {
+  color: var(--ink);
+}
+
+.gap-item p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
 }
 
 /* ── トップ：ヒーロー仕上げ ───────────────── */
@@ -2117,6 +2212,10 @@ h2 {
   .step + .step::before {
     width: 20px;
     margin: 0 6px;
+  }
+
+  .gift-message-result {
+    grid-template-columns: 1fr;
   }
 
   /* モバイルの左右ガターを 10px→20px に拡張（本文が画面端に張り付くのを解消） */

@@ -26,6 +26,49 @@ const consultationTopics = [
   { label: '失敗しにくい定番',    keywords: ['失敗', '定番', '無難', '喜ばれ', '迷っ'] },
 ]
 
+const topicSupplyRules = {
+  '彼女・パートナーへ': {
+    productKeywords: ['彼女', '妻', '彼女向け', '記念日'],
+    proposal: '彼女・パートナー向けの価格帯別ギフトセットを増やすと、AI提案の幅が広がります。',
+  },
+  '予算・コスパ重視': {
+    productKeywords: ['予算控えめ', 'カジュアル', 'プチギフト'],
+    proposal: '3,000円前後の見栄えするミニギフトを増やすと、予算相談に応えやすくなります。',
+  },
+  '肌悩み・敏感肌': {
+    productKeywords: ['敏感肌向け', '低刺激感', '保湿', '香り控えめ'],
+    proposal: '成分や香りを確認しやすい低刺激感のあるケア商品をスキンケアカテゴリに追加すると安心材料になります。',
+  },
+  '美容初心者向け': {
+    productKeywords: ['初心者向け', '定番', 'AI相談向け'],
+    proposal: '美容初心者にも使う場面が伝わりやすい定番セットを前面に出すと、迷いを減らせます。',
+  },
+  '香り・リラックス': {
+    productKeywords: ['香り控えめ', 'リラックス', 'バスグッズ', '夜ケア'],
+    proposal: '無香料・微香タイプや香り控えめのリラックス商品をギフトカテゴリに追加すると、香り不安の相談に強くなります。',
+  },
+  '高見え・記念日': {
+    productKeywords: ['高見え', '記念日', 'ギフト向け', 'セット'],
+    proposal: '箱入り・限定感のある高見えセットを増やすと、記念日相談の比較軸が作りやすくなります。',
+  },
+  '自分へのご褒美': {
+    productKeywords: ['ご褒美', 'スペシャルケア', '大人向け', '夜ケア'],
+    proposal: '自分用にも選びやすい少し上質なケア商品を編集部ピックで見せると回遊が伸びます。',
+  },
+  '友人・同僚へ': {
+    productKeywords: ['友人', '同僚', 'カジュアル', '予算控えめ'],
+    proposal: '職場や友人に配りやすい軽めのギフトを増やすと、重くないプレゼント相談に対応しやすくなります。',
+  },
+  '母・家族へ': {
+    productKeywords: ['母', '妻', '家族', '大人向け'],
+    proposal: '母・家族向けに落ち着いた香り控えめギフトを用意すると、年齢幅のある相談に提案しやすくなります。',
+  },
+  '失敗しにくい定番': {
+    productKeywords: ['失敗しにくい', '定番', '実用的', '初心者向け'],
+    proposal: '定番・実用的・好みが分かれにくい商品を一覧上部で束ねると、失敗不安の相談を受け止めやすくなります。',
+  },
+}
+
 const suggestions = [
   {
     title: '相談チップを改善する',
@@ -70,6 +113,7 @@ export default function AdminDemo() {
     ? Math.round((aiOrders.length / consultations.length) * 100)
     : null
   const topTopics = rankConsultationTopics(consultations)
+  const productGaps = detectProductGaps(topTopics)
   const topProducts = rankProducts(orders, cartEvents)
   const aiUsageToday = isSample ? sampleAiUsageToday : getAiUsageToday()
   const aiDailyLimit = getAiDailyLimit()
@@ -202,6 +246,24 @@ export default function AdminDemo() {
             </motion.div>
           ))}
         </motion.div>
+        {productGaps.length > 0 && (
+          <section className="gap-panel" aria-label="商品穴の検出">
+            <h3>商品穴の検出</h3>
+            <div className="gap-list">
+              {productGaps.map((gap) => (
+                <article className="gap-item" key={gap.label}>
+                  <div>
+                    <strong>{gap.label}</strong>
+                    <p>
+                      相談 {gap.demand}件 / 該当商品 {gap.supply}件。{gap.supply === 0 ? '商品がまだ薄い領域です。' : '相談量に対して商品幅が限られています。'}
+                    </p>
+                  </div>
+                  <p>{gap.proposal}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </section>
     </main>
   )
@@ -288,4 +350,37 @@ function rankProducts(orders, cartEvents) {
     .filter((item) => item.product)
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
+}
+
+function detectProductGaps(topTopics) {
+  return topTopics
+    .map((topic) => {
+      const rule = topicSupplyRules[topic.label]
+      if (!rule) return null
+      const supply = countMatchingProducts(rule.productKeywords)
+      return {
+        ...topic,
+        supply,
+        proposal: rule.proposal,
+        score: topic.count * Math.max(1, 4 - supply),
+      }
+    })
+    .filter(Boolean)
+    .filter((gap) => gap.count >= 1 && gap.supply <= 6)
+    .sort((a, b) => b.score - a.score || a.supply - b.supply)
+    .slice(0, 3)
+    .map(({ label, count, supply, proposal }) => ({ label, demand: count, supply, proposal }))
+}
+
+function countMatchingProducts(keywords) {
+  return products.filter((product) => {
+    const haystack = [
+      product.category,
+      product.name,
+      product.description,
+      ...product.tags,
+      ...product.giftFor,
+    ].join(' ')
+    return keywords.some((keyword) => haystack.includes(keyword))
+  }).length
 }

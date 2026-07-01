@@ -52,7 +52,18 @@ AI相談でよく選ばれる理由
 ・香りや色の好みが分かれにくい
 ```
 
-これにより商品詳細が単なるカタログでなく「相談データを反映した販売ページ」に見える。`/admin-demo` の集計ロジック（[admin-product-gap-detection.md](admin-product-gap-detection.md)）と語彙・集計を揃えると再利用が効く。個別文脈（本体 Scope）と集計（本拡張）は段階実装でよい。
+これにより商品詳細が単なるカタログでなく「相談データを反映した販売ページ」に見える。`/admin-demo` の集計ロジック（[admin-product-gap-detection.md](../backlog/admin-product-gap-detection.md)）と語彙・集計を揃えると再利用が効く。個別文脈（本体 Scope）と集計（本拡張）は段階実装でよい。
+
+## Done Evidence
+
+- `app/src/lib/cart.js`: `saveAiContext` に `recommendations` を保存できるよう拡張。コンシェルジュ経由でカート追加しても既存 query/recommendations を保持。
+- `app/src/pages/Concierge.jsx`: AI 相談結果保存時に `normalized.recommendations` を `saveAiContext` へ渡すよう変更。
+- `app/src/pages/ProductDetail.jsx`: `getAiContext` を読み、直近相談の提案商品なら「あなたの相談から選ばれました」バナーを表示。相談文と個別 recommendation の理由/渡しやすさを表示。
+- `app/src/pages/ProductDetail.jsx`: 「AI相談でよく選ばれる理由」を既存 tags/labels/price から生成し、相談由来でない通常閲覧でも販売ページとしての根拠を補強。
+- `app/e2e/demo-flow.spec.js`: 相談 → 詳細を見るで相談文脈、個別理由、「AI相談でよく選ばれる理由」が表示されることを確認。
+- `cd app && npm run build`: passed（Vite の既存 chunk size warning のみ）。
+- `cd app && npm run lint`: passed。
+- `npx playwright test`: 既存の別 repo dev server が `5173` を占有しているため、この repo を `5175` で起動し一時 config で実行。`20 passed`。
 
 ## Notes
 

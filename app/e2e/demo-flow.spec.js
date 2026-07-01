@@ -210,6 +210,28 @@ test('商品詳細からカート、注文完了、注文履歴まで通る', as
   await expect(page.getByText('モイストバランス ローション × 1')).toBeVisible()
 })
 
+test('注文完了画面でギフトメッセージを生成してコピーできる', async ({ page }) => {
+  await page.route('**/functions/v1/concierge', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      message: '少しでもほっとできる時間になればと思って選びました。',
+    }),
+  }))
+
+  await page.goto('/products/skincare-001')
+  await page.getByRole('button', { name: 'カートに入れる' }).click()
+  await page.getByRole('link', { name: /お客様情報/ }).click()
+  await page.getByLabel('お名前').fill('ギフト メッセージ')
+  await page.getByLabel('メールアドレス').fill('gift-message@example.com')
+  await page.getByRole('button', { name: /注文を確定する/ }).click()
+
+  await page.getByRole('button', { name: 'AIで一言を作る' }).click()
+  await expect(page.getByText('少しでもほっとできる時間になればと思って選びました。')).toBeVisible()
+  await page.getByRole('button', { name: 'コピー' }).click()
+  await expect(page.getByText('添え書きをコピーしました。')).toBeVisible()
+})
+
 test('商品一覧でAI並べ替えボタンがフォールバックしても表示を維持する', async ({ page }) => {
   await page.route('**/functions/v1/recommend-products', (route) => route.abort())
   await page.goto('/products')
@@ -239,4 +261,6 @@ test('admin-demo に相談と注文の集計が反映される', async ({ page }
   await expect(page.getByText('1件').first()).toBeVisible()
   await expect(page.getByText('彼女')).toBeVisible()
   await expect(page.getByText('AI 改善提案')).toBeVisible()
+  await expect(page.getByText('商品穴の検出')).toBeVisible()
+  await expect(page.getByText(/相談 \d+件 \/ 該当商品 \d+件/).first()).toBeVisible()
 })

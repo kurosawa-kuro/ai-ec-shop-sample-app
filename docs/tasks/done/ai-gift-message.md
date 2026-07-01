@@ -46,6 +46,19 @@
 - `cd app && npm run build && npm run lint && npx playwright test`
 - 手動: 生成→コピーが動く。上限時フォールバックを確認。
 
+## Done Evidence
+
+- `supabase/functions/concierge/index.ts`: `mode: "gift-message"` を追加し、既存 `concierge` Edge Function 経由で添え書き短文を生成。AI 障害時は定型文にフォールバック。
+- `app/src/lib/supabase.js`: `generateGiftMessage` を追加。AI 利用上限 `consumeAiLimit()` の対象に含め、`concierge` function へ `mode: "gift-message"` で送信。
+- `app/src/pages/Complete.jsx`: 注文完了画面に「ギフトに添える一言」生成 UI とコピー UI を追加。Clipboard API が拒否される場合は `execCommand('copy')` で fallback。
+- `app/src/index.css`: 添え書き生成パネル、結果表示、コピー状態のスタイルを追加。
+- `app/e2e/demo-flow.spec.js`: 注文完了画面で添え書きを生成し、コピー完了メッセージが出ることを確認。
+- `Makefile`: `concierge` deploy を `--use-api` 経路に変更。通常 deploy が Supabase Function store の 500 で落ちたため。
+- `cd app && npm run build`: passed（Vite の既存 chunk size warning のみ）。
+- `cd app && npm run lint`: passed。
+- `npx playwright test`: 既存の別 repo dev server が `5173` を占有しているため、この repo を `5175` で起動し一時 config で実行。`21 passed`。
+- `supabase functions deploy concierge --use-api`: passed。deployed `concierge` の `mode: "gift-message"` 実応答で `message` が返ることを確認。
+
 ## Notes
 
 - 優先度は P1。P0 群（提案カード/入口/ワンタップ）の後。

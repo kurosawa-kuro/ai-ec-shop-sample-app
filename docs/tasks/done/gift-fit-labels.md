@@ -13,7 +13,7 @@
 ## Scope
 
 - ラベルの定義（語彙）と供給元を決める: (a) `tags` からのマッピング、(b) AI レスポンス付与、のどちらか/併用。
-- 提案カード（[concierge-card-reasoning-breakdown.md](../active/concierge-card-reasoning-breakdown.md)）と比較ビュー（[three-product-comparison-view.md](three-product-comparison-view.md)）で共用。
+- 提案カード（[concierge-card-reasoning-breakdown.md](concierge-card-reasoning-breakdown.md)）と比較ビュー（[three-product-comparison-view.md](three-product-comparison-view.md)）で共用。
 
 ## Non-scope
 
@@ -40,6 +40,16 @@
 
 - `cd app && npm run build && npm run lint && npx playwright test`
 - 手動: 敏感肌系に「香り控えめ」等、妥当なラベルが出る。
+
+## Done Evidence
+
+- `app/src/lib/giftLabels.js`: `getGiftLabels`, `getGiftFitProfile`, `getComparisonRows` を追加。既存 `tags/giftFor/price/category` から「失敗しにくい」「高見え」「香り控えめ」「相手を選びにくい」等を導出。
+- `app/src/pages/Concierge.jsx`: AI 提案カードにギフト適合ラベルを表示。
+- `app/src/pages/ProductDetail.jsx`: 商品詳細にも同じギフト適合ラベルを表示。
+- `app/e2e/demo-flow.spec.js`: コンシェルジュ提案でラベルが見えることを比較導線テスト内で確認。
+- `cd app && npm run build`: passed（Vite の既存 chunk size warning のみ）。
+- `cd app && npm run lint`: passed。
+- `npx playwright test`: 既存の別 repo dev server が `5173` を占有しているため、この repo を `5175` で起動し一時 config で実行。`20 passed`。
 
 ## Notes
 
