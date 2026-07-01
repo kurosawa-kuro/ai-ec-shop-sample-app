@@ -6,12 +6,12 @@ import products from '../data/products'
 import { cardReveal, staggerFast, staggerGrid } from '../lib/motion'
 
 const promptChips = [
-  '肌が弱い友人に贈りたい',
-  '美容に詳しくない相手に失敗しにくいもの',
-  '予算5,000円で高見えするギフト',
-  '香りが強すぎないものを選びたい',
+  '肌が弱い友人へ',
+  '美容に詳しくない相手へ',
+  '予算5,000円で高見え',
+  '香りが強すぎないもの',
   '彼女への記念日ギフト',
-  '職場の女性に重すぎないプレゼント',
+  '職場の女性に気軽に',
 ]
 
 const guideGroups = [
@@ -57,7 +57,7 @@ const steps = [
   {
     num: '02',
     title: 'AIが3つに絞る',
-    body: '36品からあなたの状況に合う候補を提案。そのまま渡せる理由も一緒に添えます。',
+    body: '厳選した商品からあなたの状況に合う候補を提案。そのまま渡せる理由も一緒に添えます。',
     link: '/concierge',
     linkLabel: '提案を見る',
   },
@@ -129,7 +129,7 @@ export default function Top() {
             3つのギフトを。
           </h1>
           <p className="lead">
-            「肌が弱い女友達に贈るギフト」——そんな一言で大丈夫。36品のギフトから、渡しやすい候補を AI が3つに絞ります。
+            「肌が弱い女友達に贈るギフト」——そんな一言で大丈夫。厳選したギフトから、渡しやすい候補を AI が3つに絞ります。
           </p>
           <div className="guided-entry" aria-label="困りごとから選ぶ相談">
             {guideGroups.map((group) => (
