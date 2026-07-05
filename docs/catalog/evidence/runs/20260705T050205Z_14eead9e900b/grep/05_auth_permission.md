@@ -1,0 +1,128 @@
+# grep: auth_permission
+
+evidence_id: ev.grep.auth_permission
+description: auth / permission / role
+
+- .claude/hooks/detect-safety-boundary.sh:L3: # Layer 5 Change Boundary HARD complement: permissions(settings.json) stop Bash commands, but do
+- .claude/hooks/detect-scope-creep.sh:L2: # PostToolUse (Edit|Write|MultiEdit): soft, NON-BLOCKING nudge when one session edits more
+- .claude/hooks/detect-scope-creep.sh:L9: sid="$(printf '%s' "$input" | jq -r '.session_id // "nosession"')"
+- .claude/hooks/detect-scope-creep.sh:L18: msg="detect-scope-creep: this session has edited $n files (> Standard limit $threshold). If this is one task, re-check the weight class (classify-task) and route extra changes through control-change / reconcile-task instead of widening scope."
+- .claude/hooks/detect-unverified-claim.sh:L5: # session, a task was likely just closed — remind to confirm verify-completion produced real
+- .claude/hooks/detect-unverified-claim.sh:L12: echo "detect-unverified-claim: a task note under docs/tasks/done/ changed this session. Done requires Evidence Level >=2 (real test / runtime / DB outcome), never a claim — confirm verify-completion was run before closing (docs/specs/evidence-policy.md, Layer 8)." >&2
+- .claude/settings.json:L2: "permissions": {
+- .claude/settings.json:L75: "command": "mkdir -p .claude/logs && printf '%s session end\\n' \"$(date -u +%FT%TZ)\" >> .claude/logs/session.log"
+- .claude/settings.json:L79: "command": "d=docs/decisions/decision-log.md; if [ -f \"$d\" ]; then last=$(tail -n1 \"$d\"); case \"$last\" in '--- session boundary'*) ;; *) printf -- '\\n--- session boundary %s ---\\n' \"$(date -u +%FT%TZ)\" >> \"$d\";; esac; fi",
+- .claude/settings.json:L80: "statusMessage": "decision-log session boundary"
+- app/e2e/demo-flow.spec.js:L7: sessionStorage.clear()
+- app/e2e/demo-flow.spec.js:L19: await page.getByRole('button', { name: 'AIに相談する' }).click()
+- app/e2e/demo-flow.spec.js:L71: await page.getByRole('button', { name: 'AIに相談する' }).click()
+- app/e2e/demo-flow.spec.js:L121: await page.getByRole('button', { name: 'AIに相談する' }).click()
+- app/e2e/demo-flow.spec.js:L124: await page.getByRole('button', { name: '苦手そう' }).click()
+- app/e2e/demo-flow.spec.js:L136: await page.getByRole('button', { name: 'AIに相談する' }).click()
+- app/e2e/demo-flow.spec.js:L140: await page.getByRole('button', { name: '3品を比較する' }).click()
+- app/e2e/demo-flow.spec.js:L184: await page.getByRole('button', { name: 'AIに相談する' }).click()
+- app/e2e/demo-flow.spec.js:L185: await page.locator('.recommendation-card').first().getByRole('link', { name: '詳細を見る' }).click()
+- app/e2e/demo-flow.spec.js:L196: await page.getByRole('button', { name: 'カートに入れる' }).click()
+- app/e2e/demo-flow.spec.js:L200: await page.getByRole('link', { name: /お客様情報/ }).click()
+- app/e2e/demo-flow.spec.js:L204: await page.getByRole('button', { name: /注文を確定する/ }).click()
+- app/e2e/demo-flow.spec.js:L209: await page.getByRole('link', { name: '注文履歴を見る' }).click()
+- app/e2e/demo-flow.spec.js:L223: await page.getByRole('button', { name: 'カートに入れる' }).click()
+- app/e2e/demo-flow.spec.js:L224: await page.getByRole('link', { name: /お客様情報/ }).click()
+- app/e2e/demo-flow.spec.js:L227: await page.getByRole('button', { name: /注文を確定する/ }).click()
+- app/e2e/demo-flow.spec.js:L229: await page.getByRole('button', { name: 'AIで一言を作る' }).click()
+- app/e2e/demo-flow.spec.js:L231: await page.getByRole('button', { name: 'コピー' }).click()
+- app/e2e/demo-flow.spec.js:L239: await page.getByRole('button', { name: 'AI でおすすめ順に並べ替え' }).click()
+- app/e2e/demo-flow.spec.js:L249: await page.getByRole('button', { name: 'AIに相談する' }).click()
+- app/e2e/demo-flow.spec.js:L251: await page.locator('.recommendation-card').first().getByRole('button', { name: '追加' }).click()
+- app/e2e/demo-flow.spec.js:L256: await page.getByRole('button', { name: /注文を確定する/ }).click()
+- app/e2e/products-ui.spec.js:L6: await page.getByRole('button', { name: 'AIに相談する' }).click()
+- app/e2e/products-ui.spec.js:L13: await page.getByRole('button', { name: '母' }).click()
+- app/e2e/products-ui.spec.js:L14: await page.getByRole('button', { name: '香りが苦手' }).click()
+- app/e2e/products-ui.spec.js:L15: await page.getByRole('button', { name: '3,000円以内' }).click()
+- app/e2e/products-ui.spec.js:L16: await page.getByRole('button', { name: 'この条件で相談する' }).click()
+- app/package-lock.json:L742: "node_modules/@supabase/auth-js": {
+- app/package-lock.json:L744: "resolved": "https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.108.2.tgz",
+- app/package-lock.json:L816: "@supabase/auth-js": "2.108.2",
+- app/src/index.css:L2678: .about-role {
+- app/src/pages/About.jsx:L80: <p className="about-role">
+- app/src/pages/Checkout.jsx:L62: sessionStorage.setItem('lumiere-last-order', JSON.stringify(order))
+- app/src/pages/Complete.jsx:L116: const raw = sessionStorage.getItem('lumiere-last-order')
+- doppler.yaml:L21: # # DB_<SERVICE>_AUTH_TOKEN      # データベース認証トークン
+- supabase/config.toml:L20: # `postgres` are reachable through the Data API roles (`anon`, `authenticated`, `service_role`)
+- supabase/config.toml:L49: # Configure one of the supported pooler modes: `transaction`, `session`.
+- supabase/config.toml:L155: [auth]
+- supabase/config.toml:L160: # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
+- supabase/config.toml:L162: # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
+- supabase/config.toml:L165: jwt_expiry = 3600
+- supabase/config.toml:L166: # JWT issuer URL. If not set, defaults to auth.external_url.
+- supabase/config.toml:L167: # jwt_issuer = ""
+- supabase/config.toml:L168: # Path to JWT signing key. DO NOT commit your signing keys file to git.
+- supabase/config.toml:L188: # [auth.passkey]
+- supabase/config.toml:L191: # Configure WebAuthn relying party settings (required when passkey is enabled).
+- supabase/config.toml:L192: # [auth.webauthn]
+- supabase/config.toml:L197: [auth.rate_limit]
+- supabase/config.toml:L198: # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
+- supabase/config.toml:L200: # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
+- supabase/config.toml:L204: # Number of sessions that can be refreshed in a 5 minute interval per IP address.
+- supabase/config.toml:L210: # Number of Web3 logins that can be made in a 5 minute interval per IP address.
+- supabase/config.toml:L214: # [auth.captcha]
+- supabase/config.toml:L219: [auth.email]
+- supabase/config.toml:L227: # If enabled, users will need to reauthenticate or have logged in recently to change their password.
+- supabase/config.toml:L237: # [auth.email.smtp]
+- supabase/config.toml:L247: # [auth.email.template.invite]
+- supabase/config.toml:L252: # [auth.email.notification.password_changed]
+- supabase/config.toml:L257: [auth.sms]
+- supabase/config.toml:L268: # [auth.sms.test_otp]
+- supabase/config.toml:L271: # Configure logged in session timeouts.
+- supabase/config.toml:L272: # [auth.sessions]
+- supabase/config.toml:L279: # [auth.hook.before_user_created]
+- supabase/config.toml:L281: # uri = "pg-functions://postgres/auth/before-user-created-hook"
+- supabase/config.toml:L283: # This hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
+- supabase/config.toml:L284: # [auth.hook.custom_access_token]
+- supabase/config.toml:L289: [auth.sms.twilio]
+- supabase/config.toml:L293: # DO NOT commit your Twilio auth token to git. Use environment variable substitution instead:
+- supabase/config.toml:L294: auth_token = <redacted>
+- supabase/config.toml:L296: # Multi-factor-authentication is available to Supabase Pro plan.
+- supabase/config.toml:L297: [auth.mfa]
+- supabase/config.toml:L301: # Control MFA via App Authenticator (TOTP)
+- supabase/config.toml:L302: [auth.mfa.totp]
+- supabase/config.toml:L307: [auth.mfa.phone]
+- supabase/config.toml:L314: # Configure MFA via WebAuthn
+- supabase/config.toml:L315: # [auth.mfa.web_authn]
+- supabase/config.toml:L319: # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
+- supabase/config.toml:L322: [auth.external.apple]
+- supabase/config.toml:L325: # DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
+- supabase/config.toml:L326: secret = <redacted>
+- supabase/config.toml:L327: # Overrides the default auth callback URL derived from auth.external_url.
+- supabase/config.toml:L329: # Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
+- supabase/config.toml:L332: # If enabled, the nonce check will be skipped. Required for local sign in with Google auth.
+- supabase/config.toml:L334: # If enabled, it will allow the user to successfully authenticate when the provider does not return an email address.
+- supabase/config.toml:L338: # You can configure "web3" rate limit in the [auth.rate_limit] section and set up [auth.captcha] if self-hosting.
+- supabase/config.toml:L339: [auth.web3.solana]
+- supabase/config.toml:L342: # Use Firebase Auth as a third-party provider alongside Supabase Auth.
+- supabase/config.toml:L343: [auth.third_party.firebase]
+- supabase/config.toml:L347: # Use Auth0 as a third-party provider alongside Supabase Auth.
+- supabase/config.toml:L348: [auth.third_party.auth0]
+- supabase/config.toml:L350: # tenant = "my-auth0-tenant"
+- supabase/config.toml:L353: # Use AWS Cognito (Amplify) as a third-party provider alongside Supabase Auth.
+- supabase/config.toml:L354: [auth.third_party.aws_cognito]
+- supabase/config.toml:L359: # Use Clerk as a third-party provider alongside Supabase Auth.
+- supabase/config.toml:L360: [auth.third_party.clerk]
+- supabase/config.toml:L365: # OAuth server configuration
+- supabase/config.toml:L366: [auth.oauth_server]
+- supabase/config.toml:L367: # Enable OAuth server functionality
+- supabase/config.toml:L369: # Path for OAuth consent flow UI
+- supabase/config.toml:L370: authorization_url_path = "/oauth/consent"
+- supabase/config.toml:L418: verify_jwt = false
+- supabase/config.toml:L429: verify_jwt = false
+- supabase/functions/concierge/index.ts:L11: "Access-Control-Allow-Headers": <redacted>
+- supabase/functions/concierge/index.ts:L95: "Authorization": <redacted>
+- supabase/functions/concierge/index.ts:L101: { role: "system", content: systemPrompt },
+- supabase/functions/concierge/index.ts:L102: { role: "user", content: userPrompt },
+- supabase/functions/concierge/index.ts:L140: "Authorization": <redacted>
+- supabase/functions/concierge/index.ts:L146: { role: "system", content: systemPrompt },
+- supabase/functions/concierge/index.ts:L148: role: "user",
+- supabase/functions/recommend-products/index.ts:L10: "Access-Control-Allow-Headers": <redacted>
+- supabase/functions/recommend-products/index.ts:L44: "Authorization": <redacted>
+- supabase/functions/recommend-products/index.ts:L50: { role: "system", content: systemPrompt },
+- supabase/functions/recommend-products/index.ts:L51: { role: "user", content: `相談: ${trimmedQuery}\n\n候補商品:\n${candidateText}` },

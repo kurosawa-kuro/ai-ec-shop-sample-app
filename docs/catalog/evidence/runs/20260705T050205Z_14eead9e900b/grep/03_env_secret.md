@@ -1,0 +1,61 @@
+# grep: env_secret
+
+evidence_id: ev.grep.env_secret
+description: env / secret / credential
+
+- .claude/hooks/detect-safety-boundary.sh:L6: # docs/specs/change-boundary.md (env/secret, infra, terraform, CI workflows).
+- .claude/hooks/detect-safety-boundary.sh:L12: env/secret/*|*/env/secret/*|\
+- .claude/hooks/detect-safety-boundary.sh:L16: echo "detect-safety-boundary: <redacted>
+- app/src/lib/supabase.js:L4: const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+- app/src/lib/supabase.js:L5: const supabaseAnonKey = <redacted>
+- doppler.yaml:L9: # 非機密の設定値は env/config.yaml、ローカルだけの秘密情報は env/secret.yaml に置く。
+- doppler.yaml:L10: # env/secret.yaml は .gitignore で除外し、コミットしない。
+- doppler.yaml:L19: # # AI_OPENAI_API_KEY            # LLM プロバイダ API キー
+- doppler.yaml:L21: # # DB_<SERVICE>_AUTH_TOKEN      # データベース認証トークン
+- env/config.yaml:L4: # ローカル秘密情報は env/secret.yaml、共有・本番クレデンシャルは Doppler で管理 (doppler.yaml)
+- env/config.yaml:L11: # --- Supabase（非機密の公開 URL のみここに記載。キーは secret.yaml / Doppler）---
+- env/secret.yaml:L10: # --- OpenAI（Supabase Secrets に設定するため、ここには書かない）---
+- env/secret.yaml:L11: # openaiApiKey は Supabase Dashboard > Edge Functions > Secrets > OPENAI_API_KEY に設定する
+- supabase/config.toml:L57: # secret_key = <redacted>
+- supabase/config.toml:L101: openai_api_key = <redacted>
+- supabase/config.toml:L164: # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
+- supabase/config.toml:L170: # If disabled, the refresh token will never expire.
+- supabase/config.toml:L171: enable_refresh_token_rotation = <redacted>
+- supabase/config.toml:L172: # Allows refresh tokens to be reused after expiry, up to the specified interval in seconds.
+- supabase/config.toml:L173: # Requires enable_refresh_token_rotation = <redacted>
+- supabase/config.toml:L174: refresh_token_reuse_interval = <redacted>
+- supabase/config.toml:L181: # Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.
+- supabase/config.toml:L182: minimum_password_length = <redacted>
+- supabase/config.toml:L183: # Passwords that do not meet the following requirements will be rejected as weak. Supported values
+- supabase/config.toml:L185: password_requirements = <redacted>
+- supabase/config.toml:L205: token_refresh = <redacted>
+- supabase/config.toml:L209: token_verifications = <redacted>
+- supabase/config.toml:L217: # secret = <redacted>
+- supabase/config.toml:L227: # If enabled, users will need to reauthenticate or have logged in recently to change their password.
+- supabase/config.toml:L228: secure_password_change = <redacted>
+- supabase/config.toml:L229: # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
+- supabase/config.toml:L241: # user = <redacted>
+- supabase/config.toml:L242: # pass = <redacted>
+- supabase/config.toml:L252: # [auth.email.notification.password_changed]
+- supabase/config.toml:L254: # subject = <redacted>
+- supabase/config.toml:L255: # content_path = <redacted>
+- supabase/config.toml:L283: # This hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
+- supabase/config.toml:L284: # [auth.hook.custom_access_token]
+- supabase/config.toml:L293: # DO NOT commit your Twilio auth token to git. Use environment variable substitution instead:
+- supabase/config.toml:L294: auth_token = <redacted>
+- supabase/config.toml:L325: # DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
+- supabase/config.toml:L326: secret = <redacted>
+- supabase/config.toml:L385: # [edge_runtime.secrets]
+- supabase/config.toml:L386: # secret_key = <redacted>
+- supabase/config.toml:L404: # Configures AWS_SECRET_ACCESS_KEY for S3 bucket
+- supabase/config.toml:L405: s3_secret_key = <redacted>
+- supabase/functions/concierge/index.ts:L3: const DEEPSEEK_API_KEY = <redacted>
+- supabase/functions/concierge/index.ts:L11: "Access-Control-Allow-Headers": <redacted>
+- supabase/functions/concierge/index.ts:L95: "Authorization": <redacted>
+- supabase/functions/concierge/index.ts:L104: max_tokens: <redacted>
+- supabase/functions/concierge/index.ts:L140: "Authorization": <redacted>
+- supabase/functions/concierge/index.ts:L152: max_tokens: <redacted>
+- supabase/functions/recommend-products/index.ts:L3: const DEEPSEEK_API_KEY = <redacted>
+- supabase/functions/recommend-products/index.ts:L10: "Access-Control-Allow-Headers": <redacted>
+- supabase/functions/recommend-products/index.ts:L44: "Authorization": <redacted>
+- supabase/functions/recommend-products/index.ts:L53: max_tokens: <redacted>

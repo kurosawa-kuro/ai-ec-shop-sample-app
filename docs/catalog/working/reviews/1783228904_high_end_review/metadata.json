@@ -1,0 +1,10 @@
+{
+  "task": "dcm llm review --api",
+  "provider": "openai",
+  "model": "gpt-4.1",
+  "prompt_hash": "5b033f598c93d2a0943820945c176f0714012e158e7eda199f1caabe286a2ca0",
+  "target_git_commit": "02fa8bbe35806554863d059cd0c4d81dd8703efd",
+  "generated_at": 1783228904,
+  "duration_ms": 14607,
+  "dcm_version": "0.1.0"
+}
