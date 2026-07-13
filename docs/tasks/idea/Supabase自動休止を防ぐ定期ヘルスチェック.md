@@ -1,8 +1,11 @@
+Cloudflare Cron Triggerはよい選択です
+
 # アイデア: Supabase 無料枠の自動休止を防ぐ定期ヘルスチェック
 
 - 日付: 2026-07-13
 - 種別: idea / ops（仕様・実装方針はスコープ外。着手時に別タスクへ切り出す）
 - 正本: **`kurosawa-ai-consulting-site/docs/tasks/idea/2026-07-13-Supabase自動休止を防ぐ定期ヘルスチェック.md` をマスターとする。** このプロジェクトは kuro サイトと Supabase を共有しているため、実装は 1 系統に集約する（下記「共有プロジェクト」）。本ファイルは lumiere 側からの入口。
+- 状態: **2026-07-14 kuro 側に実装完了。** `kurosawa-ai-consulting-site/ops/supabase-keepalive/` の Cloudflare Cron Worker 1 系統が両サイトを担当する。lumiere 側に cron は追加しない。
 
 ## 発端
 
