@@ -60,15 +60,15 @@ export default function Cart() {
           <div className="line-list">
             {lines.map(({ product, quantity, source }) => (
               <article className="cart-line" key={product.id}>
-                <div className="product-image small" data-category={product.category}>
+                <div className="product-image small cart-line-image" data-category={product.category}>
                   <img src={product.imageUrl} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none" }} />
                 </div>
-                <div>
+                <div className="cart-line-details">
                   <p className="product-category">{source === 'concierge' ? 'AI相談経由' : product.category}</p>
                   <h2>{product.name}</h2>
                   <p>¥{formatPrice(product.price)}</p>
                 </div>
-                <label>
+                <label className="cart-line-quantity">
                   数量
                   <input
                     type="number"
@@ -78,8 +78,8 @@ export default function Cart() {
                     onChange={(event) => handleQuantity(product.id, event.target.value)}
                   />
                 </label>
-                <strong>¥{formatPrice(product.price * quantity)}</strong>
-                <button type="button" className="icon-button" onClick={() => handleRemove(product.id)}>
+                <strong className="cart-line-total">¥{formatPrice(product.price * quantity)}</strong>
+                <button type="button" className="icon-button cart-line-remove" onClick={() => handleRemove(product.id)}>
                   <Trash2 size={18} aria-hidden="true" />
                   <span className="sr-only">削除</span>
                 </button>

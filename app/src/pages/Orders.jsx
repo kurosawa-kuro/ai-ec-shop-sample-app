@@ -25,7 +25,7 @@ export default function Orders() {
         <section className="orders-list">
           {orders.map((order) => (
             <article className="order-card" key={order.id}>
-              <div>
+              <div className="order-card-details">
                 <p className="product-category">{order.fromAi ? 'AI相談経由' : '通常注文'}</p>
                 <h2>{order.id}</h2>
                 <p>{new Date(order.orderedAt).toLocaleString('ja-JP')}</p>
@@ -37,7 +37,7 @@ export default function Orders() {
                   </span>
                 ))}
               </div>
-              <strong>¥{new Intl.NumberFormat('ja-JP').format(order.total)}</strong>
+              <strong className="order-card-total">¥{new Intl.NumberFormat('ja-JP').format(order.total)}</strong>
             </article>
           ))}
         </section>

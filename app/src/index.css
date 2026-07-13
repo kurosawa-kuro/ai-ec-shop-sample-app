@@ -2144,11 +2144,88 @@ h2 {
   }
 
   .filters,
-  .cart-line,
-  .order-card,
   /* モバイルは 1 カラムなので追従は無効化（フォームが画面に貼り付くのを防ぐ） */
   .chat-panel {
     position: static;
+  }
+
+  /* 注文情報・商品・合計を縦に並べ、商品名が細い列で縦書き状になるのを防ぐ */
+  .order-card {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+  }
+
+  .order-card-details,
+  .order-items {
+    min-width: 0;
+  }
+
+  .order-card-details h2 {
+    font-size: 1rem;
+    overflow-wrap: anywhere;
+  }
+
+  .order-items span {
+    max-width: 100%;
+    border-radius: 10px;
+    overflow-wrap: anywhere;
+  }
+
+  .order-card-total {
+    justify-self: end;
+    white-space: nowrap;
+  }
+
+  /* カートの商品行を狭幅向けに再配置し、デスクトップの5列が横方向に潰れるのを防ぐ */
+  .cart-line {
+    grid-template-columns: 88px minmax(0, 1fr) 44px;
+    grid-template-rows: auto auto auto;
+    align-items: start;
+    column-gap: 12px;
+  }
+
+  .cart-line-image {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+  }
+
+  .cart-line .product-image.small {
+    width: 88px;
+    height: 88px;
+    min-height: 0;
+    aspect-ratio: 1;
+  }
+
+  .cart-line-details {
+    min-width: 0;
+    grid-column: 2 / -1;
+    grid-row: 1;
+  }
+
+  .cart-line-details h2 {
+    margin-bottom: 4px;
+    font-size: 1rem;
+    line-height: var(--leading-normal);
+  }
+
+  .cart-line-quantity {
+    width: 88px;
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .cart-line-total {
+    align-self: center;
+    grid-column: 2 / -1;
+    grid-row: 3;
+    justify-self: end;
+    white-space: nowrap;
+  }
+
+  .cart-line-remove {
+    grid-column: 3;
+    grid-row: 2;
   }
 
   /* 推薦カードはモバイルでも画像を小さく左寄せ（1fr にすると画像が全幅で巨大化する） */
