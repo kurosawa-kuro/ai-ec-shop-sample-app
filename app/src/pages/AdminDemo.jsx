@@ -2,6 +2,7 @@ import { BarChart3, Gauge, Lightbulb, MessageSquareText, ShoppingBag, Sparkles, 
 import { motion, useMotionValue, useSpring } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import PageHeader from '../components/ui/PageHeader'
 import products from '../data/products'
 import {
   sampleAiUsageToday,
@@ -121,12 +122,11 @@ export default function AdminDemo() {
 
   return (
     <main className="site-page admin-page">
-      <section className="page-heading">
-        <p className="eyebrow">
-          <BarChart3 size={18} aria-hidden="true" />
-          Store AI dashboard
-        </p>
-        <h1>店舗インサイト</h1>
+      <PageHeader
+        eyebrow="Store AI dashboard"
+        icon={<BarChart3 size={18} aria-hidden="true" />}
+        title="店舗インサイト"
+      >
         <p className="lead">
           セッション内の localStorage から、AI 経由注文・よくある相談・売れ筋・改善提案を見せる店舗側デモ画面です。
         </p>
@@ -136,7 +136,7 @@ export default function AdminDemo() {
             サンプルデータを表示中 — 相談や注文を行うと、この画面に実績が反映されます。
           </p>
         )}
-      </section>
+      </PageHeader>
 
       <motion.section
         className="metric-grid"

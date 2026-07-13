@@ -9,7 +9,7 @@ const routes = [
   { path: '/cart',                     label: 'カートを確認' },
   { path: '/checkout',                 label: 'お客様情報の入力' },
   { path: '/complete',                 label: 'ご注文ありがとうございます' },
-  { path: '/orders',                   label: 'Orders' },
+  { path: '/orders',                   label: '注文履歴' },
   { path: '/admin-demo',               label: '店舗インサイト' },
 ]
 

@@ -63,20 +63,8 @@ function Bullet({ item, onComplete }) {
 
   return (
     <motion.div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: SIZE,
-        height: SIZE,
-        borderRadius: 12,
-        overflow: 'hidden',
-        boxShadow: '0 6px 24px rgba(0,0,0,0.22)',
-        border: '2.5px solid rgba(255,255,255,0.9)',
-        pointerEvents: 'none',
-        zIndex: 9999,
-        background: GRADIENTS[category] ?? 'linear-gradient(135deg,#fdf0ed,#ead9d5)',
-      }}
+      className="flying-cart-item"
+      style={{ '--flying-cart-size': `${SIZE}px`, '--flying-cart-bg': GRADIENTS[category] ?? 'linear-gradient(135deg,#fdf0ed,#ead9d5)' }}
       initial={{ x: sx, y: sy, scale: 1, opacity: 1 }}
       animate={{
         x: [sx, mx, ex],
@@ -94,7 +82,7 @@ function Bullet({ item, onComplete }) {
       {imageUrl && (
         <img
           src={imageUrl}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+          className="flying-cart-image"
           alt=""
           onError={(e) => { e.currentTarget.style.display = 'none' }}
         />

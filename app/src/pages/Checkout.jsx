@@ -2,6 +2,8 @@ import { CreditCard } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import CheckoutSteps from '../components/CheckoutSteps'
+import PageHeader from '../components/ui/PageHeader'
+import Panel from '../components/ui/Panel'
 import products from '../data/products'
 import { clearCart, createOrderNumber, getAiContext, getCart, saveOrder } from '../lib/cart'
 import { startViewTransition } from '../lib/viewTransition'
@@ -67,16 +69,19 @@ export default function Checkout() {
     <main className="site-page flow-page">
       <CheckoutSteps current={2} />
 
-      <section className="page-heading">
-        <Link className="text-link" to="/cart">
-          ← カートに戻る
-        </Link>
-        <h1>お客様情報の入力</h1>
+      <PageHeader
+        title="お客様情報の入力"
+        actions={(
+          <Link className="text-link" to="/cart">
+            ← カートに戻る
+          </Link>
+        )}
+      >
         <p className="lead">デモ用の簡易フォームです。実決済・配送処理は行いません。</p>
-      </section>
+      </PageHeader>
 
       <form className="checkout-layout" onSubmit={handleSubmit}>
-        <section className="checkout-form">
+        <Panel className="checkout-form">
           <label>
             お名前
             <input
@@ -98,9 +103,9 @@ export default function Checkout() {
             <CreditCard size={18} aria-hidden="true" />
             注文を確定する（デモ）
           </button>
-        </section>
+        </Panel>
 
-        <aside className="summary-panel">
+        <Panel as="aside" className="summary-panel">
           <p>注文内容{isDemo ? '（デモサンプル）' : ''}</p>
           {lines.map(({ product, quantity }) => (
             <div className="summary-line" key={product.id}>
@@ -115,7 +120,7 @@ export default function Checkout() {
             <span>合計</span>
             <strong>¥{formatPrice(total)}</strong>
           </div>
-        </aside>
+        </Panel>
       </form>
     </main>
   )

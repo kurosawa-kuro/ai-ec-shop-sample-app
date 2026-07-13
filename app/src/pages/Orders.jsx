@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import EmptyState from '../components/ui/EmptyState'
+import PageHeader from '../components/ui/PageHeader'
 import { getOrders } from '../lib/cart'
 
 export default function Orders() {
@@ -6,18 +8,19 @@ export default function Orders() {
 
   return (
     <main className="site-page flow-page">
-      <section className="page-heading">
-        <h1>Orders</h1>
+      <PageHeader title="注文履歴">
         <p className="lead">localStorage に保存されたデモ注文の履歴です。</p>
-      </section>
+      </PageHeader>
 
       {orders.length === 0 ? (
-        <section className="empty-state">
-          <p>注文履歴はまだありません。</p>
-          <Link className="button primary" to="/products">
-            商品を見る
-          </Link>
-        </section>
+        <EmptyState
+          title="注文履歴はまだありません"
+          action={(
+            <Link className="button primary" to="/products">
+              商品を見る
+            </Link>
+          )}
+        />
       ) : (
         <section className="orders-list">
           {orders.map((order) => (

@@ -2,6 +2,8 @@ import { Check, ShoppingCart, SlidersHorizontal, Sparkles } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useMemo, useRef, useState } from 'react'
 import TransitionLink from '../components/TransitionLink'
+import EmptyState from '../components/ui/EmptyState'
+import PageHeader from '../components/ui/PageHeader'
 import products from '../data/products'
 import { addToCart } from '../lib/cart'
 import { cardReveal, staggerGrid } from '../lib/motion'
@@ -104,16 +106,15 @@ export default function Products() {
 
   return (
     <main className="site-page products-page">
-      <section className="page-heading">
-        <p className="eyebrow">
-          <SlidersHorizontal size={18} aria-hidden="true" />
-          Product finder
-        </p>
-        <h1>商品一覧</h1>
+      <PageHeader
+        eyebrow="Product finder"
+        icon={<SlidersHorizontal size={18} aria-hidden="true" />}
+        title="商品一覧"
+      >
         <p className="lead">
           36 件の固定商品から、カテゴリ・予算・タグ・キーワードで候補を絞り込めます。
         </p>
-      </section>
+      </PageHeader>
 
       <section className="filters" aria-label="商品絞り込み">
         <label>
@@ -222,7 +223,9 @@ export default function Products() {
       </motion.section>
 
       {filteredProducts.length === 0 && (
-        <p className="empty-state">条件に合う商品がありません。絞り込みを少し広げてください。</p>
+        <EmptyState title="条件に合う商品がありません">
+          <p>絞り込みを少し広げてください。</p>
+        </EmptyState>
       )}
     </main>
   )

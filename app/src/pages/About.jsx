@@ -1,6 +1,7 @@
 import { ArrowRight, BarChart3, MessagesSquare, ShieldCheck, Sparkles } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
+import PageHeader from '../components/ui/PageHeader'
 import { cardReveal, staggerGrid } from '../lib/motion'
 
 const proofs = [
@@ -33,12 +34,11 @@ const stack = [
 export default function About() {
   return (
     <main className="site-page about-page">
-      <section className="page-heading">
-        <p className="eyebrow">
-          <Sparkles size={18} aria-hidden="true" />
-          About this demo
-        </p>
-        <h1>要件定義から本番デプロイまで、一人称で作った AI 実装デモ</h1>
+      <PageHeader
+        eyebrow="About this demo"
+        icon={<Sparkles size={18} aria-hidden="true" />}
+        title="要件定義から本番デプロイまで、一人称で作った AI 実装デモ"
+      >
         <p className="lead">
           このサイトは、黒澤俊文が要件定義・UI 設計・AI 実装・デプロイ・テストまで一人称で構築した、AI
           ギフトコンシェルジュの実装デモです。「自社プロダクトに“効く AI”を入れられるか」を、スライドではなく動くもので示すことを目的にしています。
@@ -52,7 +52,7 @@ export default function About() {
             店舗インサイトを見る
           </Link>
         </div>
-      </section>
+      </PageHeader>
 
       <motion.section
         className="about-proofs"

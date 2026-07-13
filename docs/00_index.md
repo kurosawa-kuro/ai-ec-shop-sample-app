@@ -37,6 +37,7 @@
 | [08_release_runbook.md](./08_release_runbook.md) | リリース・マイグレーション・復旧 |
 | [tasks/README.md](./tasks/README.md) | 日次運用の実行ハブ、作業計画、実装タスク |
 | [runbooks/frontend-design-rebuild-runbook.md](./runbooks/frontend-design-rebuild-runbook.md) | フロントデザイン・アニメーション改善の実行手順 |
+| [specs/frontend-design-system.md](./specs/frontend-design-system.md) | UI 基盤、共通コンポーネント、レスポンシブと CSS の実装ルール |
 
 ## ハーネス（AI 制御）
 

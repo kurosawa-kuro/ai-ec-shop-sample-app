@@ -3,6 +3,9 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import CheckoutSteps from '../components/CheckoutSteps'
 import TransitionLink from '../components/TransitionLink'
+import EmptyState from '../components/ui/EmptyState'
+import PageHeader from '../components/ui/PageHeader'
+import Panel from '../components/ui/Panel'
 import products from '../data/products'
 import { getCart, removeFromCart, updateCartQuantity } from '../lib/cart'
 
@@ -32,21 +35,26 @@ export default function Cart() {
     <main className="site-page flow-page">
       <CheckoutSteps current={1} />
 
-      <section className="page-heading">
-        <Link className="text-link" to="/products">
-          ← 商品一覧へ戻る
-        </Link>
-        <h1>カートを確認</h1>
+      <PageHeader
+        title="カートを確認"
+        actions={(
+          <Link className="text-link" to="/products">
+            ← 商品一覧へ戻る
+          </Link>
+        )}
+      >
         <p className="lead">数量の変更や削除をして、内容がよければ次へ進んでください。</p>
-      </section>
+      </PageHeader>
 
       {lines.length === 0 ? (
-        <section className="empty-state">
-          <p>カートは空です。</p>
-          <Link className="button primary" to="/products">
-            商品を見る
-          </Link>
-        </section>
+        <EmptyState
+          title="カートは空です"
+          action={(
+            <Link className="button primary" to="/products">
+              商品を見る
+            </Link>
+          )}
+        />
       ) : (
         <section className="flow-layout">
           <div className="line-list">
@@ -79,7 +87,7 @@ export default function Cart() {
             ))}
           </div>
 
-          <aside className="summary-panel">
+          <Panel as="aside" className="summary-panel">
             <p>小計</p>
             <strong>¥{formatPrice(total)}</strong>
             <TransitionLink className="button primary" to="/checkout">
@@ -88,7 +96,7 @@ export default function Cart() {
             <Link className="button secondary" to="/products">
               ← 買い物を続ける
             </Link>
-          </aside>
+          </Panel>
         </section>
       )}
     </main>

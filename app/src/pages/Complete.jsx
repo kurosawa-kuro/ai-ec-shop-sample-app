@@ -2,6 +2,7 @@ import { CheckCircle2, Copy, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import CheckoutSteps from '../components/CheckoutSteps'
+import Panel from '../components/ui/Panel'
 import { getAiContext } from '../lib/cart'
 import { generateGiftMessage } from '../lib/supabase'
 
@@ -54,7 +55,7 @@ export default function Complete() {
     <main className="site-page flow-page">
       <CheckoutSteps current={3} />
 
-      <section className="complete-panel">
+      <Panel className="complete-panel">
         <CheckCircle2 size={42} aria-hidden="true" />
         <h1>ご注文ありがとうございます</h1>
         {order ? (
@@ -106,7 +107,7 @@ export default function Complete() {
             トップへ戻る
           </Link>
         </div>
-      </section>
+      </Panel>
     </main>
   )
 }

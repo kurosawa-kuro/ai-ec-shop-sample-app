@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import TransitionLink from '../components/TransitionLink'
+import PageHeader from '../components/ui/PageHeader'
 import products from '../data/products'
 import { addToCart, recordConsultation, saveAiContext } from '../lib/cart'
 import { getComparisonRows, getGiftLabels } from '../lib/giftLabels'
@@ -158,16 +159,15 @@ export default function Concierge() {
 
   return (
     <main className="site-page concierge-page">
-      <section className="page-heading">
-        <p className="eyebrow">
-          <Sparkles size={18} aria-hidden="true" />
-          AI concierge
-        </p>
-        <h1>Concierge</h1>
+      <PageHeader
+        eyebrow="AI concierge"
+        icon={<Sparkles size={18} aria-hidden="true" />}
+        title="Concierge"
+      >
         <p className="lead">
           相手、予算、避けたい好みをそのまま入力してください。2ターン以内におすすめ商品まで案内します。
         </p>
-      </section>
+      </PageHeader>
 
       <section className="concierge-layout">
         <form className="chat-panel" onSubmit={handleSubmit}>
@@ -200,7 +200,7 @@ export default function Concierge() {
             whileTap={{ scale: 0.96 }}
           >
             <motion.span
-              style={{ display: 'inline-flex' }}
+              className="motion-icon"
               animate={isLoading ? { rotate: 360 } : { rotate: 0 }}
               transition={isLoading
                 ? { repeat: Infinity, duration: 1.1, ease: 'linear' }
@@ -226,7 +226,7 @@ export default function Concierge() {
                 >
                   <div className="thinking-header-row">
                     <motion.span
-                      style={{ display: 'inline-flex' }}
+                      className="motion-icon"
                       animate={{ rotate: 360 }}
                       transition={{ repeat: Infinity, duration: 2.5, ease: 'linear' }}
                     >
@@ -234,9 +234,9 @@ export default function Concierge() {
                     </motion.span>
                     <span>AIが最適な3品を選んでいます</span>
                     <motion.span
+                      className="thinking-dots"
                       animate={{ opacity: [1, 0.25, 1] }}
                       transition={{ repeat: Infinity, duration: 1.2 }}
-                      style={{ letterSpacing: '0.12em' }}
                     >
                       ...
                     </motion.span>
@@ -259,9 +259,9 @@ export default function Concierge() {
                       >
                         <div className="skeleton-image shimmer" />
                         <div className="skeleton-body">
-                          <div className="skeleton-line shimmer" style={{ width: '32%' }} />
-                          <div className="skeleton-line shimmer" style={{ width: '78%' }} />
-                          <div className="skeleton-line shimmer" style={{ width: '56%' }} />
+                          <div className="skeleton-line skeleton-line-short shimmer" />
+                          <div className="skeleton-line skeleton-line-long shimmer" />
+                          <div className="skeleton-line skeleton-line-medium shimmer" />
                         </div>
                       </motion.div>
                     ))}
