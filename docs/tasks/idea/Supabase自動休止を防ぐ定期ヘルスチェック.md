@@ -1,11 +1,9 @@
-Cloudflare Cron Triggerはよい選択です
-
 # アイデア: Supabase 無料枠の自動休止を防ぐ定期ヘルスチェック
 
 - 日付: 2026-07-13
 - 種別: idea / ops（仕様・実装方針はスコープ外。着手時に別タスクへ切り出す）
 - 正本: **`kurosawa-ai-consulting-site/docs/tasks/idea/2026-07-13-Supabase自動休止を防ぐ定期ヘルスチェック.md` をマスターとする。** このプロジェクトは kuro サイトと Supabase を共有しているため、実装は 1 系統に集約する（下記「共有プロジェクト」）。本ファイルは lumiere 側からの入口。
-- 状態: **2026-07-14 kuro 側に実装完了。** `kurosawa-ai-consulting-site/ops/supabase-keepalive/` の Cloudflare Cron Worker 1 系統が両サイトを担当する。lumiere 側に cron は追加しない。
+- 状態: **2026-07-14 kuro 側に実装・本番反映完了。** `kurosawa-ai-consulting-site/ops/supabase-keepalive/` の Cloudflare Cron Worker 1 系統が両サイトを担当する。lumiere 側に cron は追加しない。
 
 ## 発端
 
@@ -28,27 +26,23 @@ Cloudflare Cron Triggerはよい選択です
 - → keep-alive は **1 系統に集約**する。2 つ作らない（同じプロジェクトを二重に叩くだけで無駄・drift の温床）。
 - cron をどちらのリポに置くかは着手時に 1 箇所へ決定する。どちらの Edge Function を叩いてもプロジェクト全体が生き延びるので、叩く関数は 1 つで足りる。
 
-## 方針（案）
+## 決定・実装内容
 
-- 数日おき（例: **3 日ごと**。7 日に対し十分な余裕）に Edge Function を 1 回叩く。
-- **LLM コストを出さない叩き方**にする（DeepSeek を呼ばない）:
-  - OPTIONS（CORS preflight）→ 200 を返し LLM 未呼び出し、または
-  - 必須項目を欠いた POST → バリデーションエラーで関数は起動するが LLM 未呼び出し。
-- いずれも「Edge Function 起動＝プロジェクトのアクティビティ」になる想定。
+- `kurosawa-ai-consulting-site` の Cloudflare Cron Worker に一本化した。
+- 毎日 03:23 UTC に起動し、PostgREST 経由で singleton `project_health` を 3 回 `SELECT` する。
+- Edge Function の OPTIONS ではなく、Supabase が休止判定の根拠として説明する user database activity を直接発生させる。LLM 呼び出しや書き込みは行わない。
+- `anon` には対象 1 行の `SELECT` だけを RLS で許可し、anon key は Cloudflare Secret で管理する。
+- 失敗時は構造化エラーログを出して throw し、Cron Event を失敗扱いにする。
+- GitHub Actions は、公開リポジトリが 60 日間非アクティブだと scheduled workflow が自動無効化されるため不採用とした。
 
-## 実行場所の候補（着手時に 1 つ選ぶ）
+## 残作業
 
-1. **GitHub Actions の `schedule`（cron）** ← 推奨。無料・リポでバージョン管理・追加インフラ不要。anon key は GitHub Secrets。
-2. Cloudflare Workers Cron Triggers（サイトが CF Pages のため親和性が高い）。
-3. 外部監視（UptimeRobot 等）。keep-alive と死活監視を兼ねられるが外部サービス依存。
-
-## 着手時に確定すべきオープン事項
-
-- [ ] Supabase の「アクティビティ」判定に **Edge Function 起動が本当にカウントされるか要検証**。カウントされない場合の代替: 極小 `health` テーブルを 1 つ作り PostgREST で `select`（※現状は両リポとも DB テーブル無し＝localStorage 運用のため、テーブル新設が必要）。
-- [ ] インターバル（3 日 or それ未満）。
-- [ ] 実行場所（上記 1〜3）と、どのリポに cron を置くか。
-- [ ] 失敗時の通知（pause 検知 → メール / Slack）。死活監視を兼ねるか。
-- [ ] anon key の保管場所（Secrets）。ハードコードしない。
+- [x] 実行基盤・実行間隔・DB activity の方法を確定
+- [x] Worker、migration、test、runbook を実装
+- [x] 本番 migration を適用
+- [x] Cloudflare Secret を登録し Worker をデプロイ
+- [x] 本番 Supabase へ同一の health query を3回実行し、全件成功を確認
+- [ ] 初回 scheduled event 後に Workers Logs / Cron Events を確認
 
 ## スコープ外
 
