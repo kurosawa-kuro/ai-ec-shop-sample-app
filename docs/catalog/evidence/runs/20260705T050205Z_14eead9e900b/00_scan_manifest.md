@@ -6,7 +6,7 @@ scan_id: 20260705T050205Z_14eead9e900b
 generated_at: 2026-07-05T05:02:05Z
 tool: decision-catalog (dcm)
 language: infra+web
-root: /home/ubuntu/repos/ai-ec-shop-sample-app
+root: /home/ubuntu/repos/portfolio/lumiere-select
 git_commit: 02fa8bbe35806554863d059cd0c4d81dd8703efd
 git_branch: main
 git_dirty: false

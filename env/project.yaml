@@ -3,7 +3,7 @@
 # Edit this file after moving or renaming the project, then run:
 #   make render-project-config
 
-projectName: ai-ec-shop-sample-app
-repoRoot: /home/ubuntu/repos/ai-ec-shop-sample-app
+projectName: lumiere-select
+repoRoot: /home/ubuntu/repos/portfolio/lumiere-select
 workspaceRoot: /home/ubuntu/repos
 homeDir: /home/ubuntu
